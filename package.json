@@ -23,6 +23,7 @@
   "description": "",
   "packageManager": "pnpm@10.8.0+sha512.0e82714d1b5b43c74610193cb20734897c1d00de89d0e18420aebc5977fa13d780a9cb05734624e81ebd81cc876cd464794850641c48b9544326b5622ca29971",
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.15.14",
     "argon2": "^0.43.0",
     "cors": "^2.8.5",
@@ -30,9 +31,9 @@
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.14.1",
     "morgan": "^1.10.0",
-    "typescript": "^5.8.3",
     "zod": "^3.24.4"
   },
   "devDependencies": {
@@ -43,6 +44,7 @@
     "eslint": "^9.26.0",
     "husky": "^8.0.3",
     "lint-staged": "^15.5.2",
-    "ts-node-dev": "^2.0.0"
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
   }
 }

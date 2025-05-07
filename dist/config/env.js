@@ -3,34 +3,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.env = void 0;
+exports.config = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
-const zod_1 = require("zod");
-dotenv_1.default.config();
-const envSchema = zod_1.z.object({
-    NODE_ENV: zod_1.z.enum(['development', 'production', 'test']).default('development'),
-    PORT: zod_1.z.string().default("3001"),
-    MONGODB_URI: zod_1.z.string(),
-    JWT_SECRET: zod_1.z.string(),
-    JWT_EXPIRES_IN: zod_1.z.string().default('7d'),
-    SMPT_HOST: zod_1.z.string(),
-    SMPT_PORT: zod_1.z.string(),
-    SMPT_USER: zod_1.z.string(),
-    SMPT_PASS: zod_1.z.string(),
-    EMAIL_FROM: zod_1.z.string(),
-    FRONTEND_URL: zod_1.z.string(),
-});
-// Validate and extract environment variables
-exports.env = envSchema.parse({
-    NODE_ENV: process.env.NODE_ENV,
-    PORT: process.env.PORT,
-    MONGODB_URI: process.env.MONGODB_URI,
-    JWT_SECRET: process.env.JWT_SECRET,
-    JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
-    SMTP_HOST: process.env.SMTP_HOST,
-    SMTP_PORT: process.env.SMTP_PORT,
-    SMTP_USER: process.env.SMTP_USER,
-    SMTP_PASS: process.env.SMTP_PASS,
-    EMAIL_FROM: process.env.EMAIL_FROM,
-    FRONTEND_URL: process.env.FRONTEND_URL,
-});
+const path_1 = __importDefault(require("path"));
+// Load environment variables
+dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../../.env') });
+exports.config = {
+    // Server configuration
+    port: process.env.PORT || '8000',
+    nodeEnv: process.env.NODE_ENV || 'development',
+    mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/tailoring-platform',
+    jwtSecret: process.env.JWT_SECRET || "default-secret-key", // Simple string assignment
+    jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
+    // Email Settings
+    emailHost: process.env.EMAIL_HOST || 'smpt.willsdan000.com',
+    emailPort: parseInt(process.env.EMAIL_PORT || '587', 10),
+    emailUser: process.env.EMAIL_USER || 'willsdan000@gmail.com',
+    emailPass: process.env.EMAIL_PASS || 'password',
+    emailFrom: process.env.EMAIL_FROM || 'noreply@tailoring.com',
+    // Frontend URL (for CORS and email links)
+    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+    maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '5', 10) * 1024 * 1024,
+};
+// Validate critical environment variables
+const requiredEnvVars = ['JWT_SECRET', 'MONGO_URI'];
+for (const envVar of requiredEnvVars) {
+    if (!process.env[envVar] && process.env.NODE_ENV === "production") {
+        console.log(`Warning: Environment variable ${envVar} is not set in production mode.`);
+    }
+}
