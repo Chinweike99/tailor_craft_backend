@@ -26,14 +26,13 @@
     // "moduleDetection": "auto",                        /* Control what method is used to detect module-format JS files. */
 
 
-    "target": "es2020",
-    "module": "commonjs",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+      "target": "ES6",
+      "module": "commonjs",
+      "rootDir": "src",
+      "outDir": "dist",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true
 
 
     /* Modules */
@@ -121,6 +120,6 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     // "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
-  "include": ["src/**/*"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
