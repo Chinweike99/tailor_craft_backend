@@ -2,7 +2,8 @@
   "name": "tailor_craft_backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
+  "type": "module",
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec \"tsx src/index.ts\"",
     "test": "jest",
@@ -16,7 +17,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Chinweike99/tailor_craft_backend/issues"
   },
@@ -24,7 +24,6 @@
   "dependencies": {
     "cloudinary": "^2.7.0",
     "dotenv": "^17.2.0",
-    "eslint": "^9.31.0",
     "express-rate-limit": "^8.0.1",
     "helmet": "^8.1.0",
     "ioredis": "^5.6.1",
@@ -32,12 +31,17 @@
     "redis": "^5.6.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.31.0",
     "@prisma/client": "^6.12.0",
     "@types/jsonwebtoken": "^9.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.37.0",
+    "@typescript-eslint/parser": "^8.37.0",
     "argon2": "^0.43.1",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
+    "eslint": "^9.31.0",
     "express": "^5.1.0",
+    "globals": "^16.3.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
     "prisma": "^6.12.0"
