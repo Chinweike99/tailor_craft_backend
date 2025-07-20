@@ -1,2 +1,13 @@
+# .gitignore
+
+# Node modules
+node_modules/
+
+# Environment variables
 .env
-node_modules
+
+# Optional: OS and editor junk
+.DS_Store
+*.log
+.env.*
+dist/
