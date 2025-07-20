@@ -3,11 +3,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-
 const port = process.env.PORT || 4000;
 
 app.get('/', (req: Request, res: Response) => {
-    res.send(`Welcome to TailorCraft Backend! 👌`)
+    res.send(`Welcome to TailorCraft Backend! 👌`);
 })
 
 app.listen(port, () => {
