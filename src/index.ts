@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import app from './app';
-import { prisma } from './config.ts/config.db';
+import { prisma } from './config/config';
 dotenv.config();
 
 

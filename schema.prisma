@@ -7,39 +7,147 @@ datasource db {
   url      = env("EXTERNAL_DB_URL")
 }
 
-model addresses {
-  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId     String    @db.Uuid
-  street     String
-  city       String
-  state      String
-  country    String
-  postalCode String
-  isDefault  Boolean?  @default(false)
-  createdAt  DateTime? @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime? @default(now()) @db.Timestamp(6)
-  users      users     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model Booking {
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String         @db.Uuid
+  designId      String?        @db.Uuid
+  customDesign  Json?
+  measurements  Json
+  deliveryDate  DateTime       @db.Timestamptz(6)
+  notes         String?
+  status        BookingStatus? @default(PENDING)
+  paymentStatus PaymentStatus? @default(UNPAID)
+  declineReason String?
+  hasReview     Boolean?       @default(false)
+  createdAt     DateTime?      @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime?      @default(now()) @db.Timestamptz(6)
+  Design        Design?        @relation(fields: [designId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_booking_design")
+  User          User           @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_booking_user")
+  Payment       Payment[]
+  Reminder      Reminder[]
+  Review        Review[]
 }
 
-model users {
-  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email        String      @unique
-  phone        String      @unique
-  password     String
-  firstName    String
-  lastName     String
-  isVerified   Boolean?    @default(false)
-  is2FAEnabled Boolean?    @default(false)
-  role         Role?       @default(CLIENT)
-  otp          String?
-  otpExpiry    DateTime?   @db.Timestamp(6)
-  profileImage String?
-  createdAt    DateTime?   @default(now()) @db.Timestamp(6)
-  updatedAt    DateTime?   @default(now()) @db.Timestamp(6)
-  addresses    addresses[]
+model Design {
+  id                  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title               String
+  description         String
+  images              String[]
+  priceRange          Json
+  category            DesignCategory
+  minimumDeliveryTime Int
+  requiredMaterials   String[]
+  isActive            Boolean?       @default(true)
+  createdAt           DateTime?      @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime?      @default(now()) @db.Timestamptz(6)
+  Booking             Booking[]
+}
+
+model Guide {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  description String
+  type        String
+  resourceUrl String
+  createdAt   DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model Material {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  description String?
+  createdAt   DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model Payment {
+  id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String         @db.Uuid
+  bookingId        String         @db.Uuid
+  amount           Float
+  status           PaymentStatus? @default(UNPAID)
+  isInstallment    Boolean?       @default(false)
+  paymentReference String?
+  paymentUrl       String?
+  createdAt        DateTime?      @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime?      @default(now()) @db.Timestamptz(6)
+  Booking          Booking        @relation(fields: [bookingId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_payment_booking")
+  User             User           @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_payment_user")
+}
+
+model Reminder {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bookingId  String    @db.Uuid
+  userId     String    @db.Uuid
+  daysBefore Int
+  sentAt     DateTime? @default(now()) @db.Timestamptz(6)
+  Booking    Booking   @relation(fields: [bookingId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_reminder_booking")
+  User       User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_reminder_user")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Review {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String    @db.Uuid
+  bookingId String    @db.Uuid
+  rating    Int?
+  comment   String
+  createdAt DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime? @default(now()) @db.Timestamptz(6)
+  Booking   Booking   @relation(fields: [bookingId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_review_booking")
+  User      User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_review_user")
+}
+
+model User {
+  id                     String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                   String
+  email                  String     @unique
+  phone                  String
+  password               String
+  role                   UserRole?  @default(CLIENT)
+  isVerified             Boolean?   @default(false)
+  otp                    String?
+  otpExpires             DateTime?  @db.Timestamptz(6)
+  profileImage           String?
+  bio                    String?
+  address                Json?
+  preferredPickupAddress Json?
+  createdAt              DateTime?  @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime?  @default(now()) @db.Timestamptz(6)
+  Booking                Booking[]
+  Payment                Payment[]
+  Reminder               Reminder[]
+  Review                 Review[]
 }
 
 enum Role {
   CLIENT
   ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum DesignCategory {
+  NATIVE
+  CASUAL
+  FORMAL
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIAL
+  SUCCESS
+}
+
+enum UserRole {
+  ADMIN
+  CLIENT
 }
