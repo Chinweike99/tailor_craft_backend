@@ -47,7 +47,7 @@ export class ConflictError extends AppError {
 }
 
 export class ValidationError extends AppError {
-    public readonly errors: Record<string, string[]> | undefined;
+    public readonly errors: Record<string, string[]> ;
 
     constructor(errors: Record<string, string[]>, message = "validation failed"){
         super(message, 422);

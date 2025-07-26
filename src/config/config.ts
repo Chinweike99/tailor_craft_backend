@@ -26,7 +26,7 @@ export default {
         refreshExpiration: process.env.JWT_REFRESH_EXPIRATION as string
     },
     redis: {
-        url: process.env.REDIS_URL
+        url: process.env.REDIS_URL as string
     },
     paystack: {
         secretKey: process.env.PAYSTACK_SECRET_KEY,
