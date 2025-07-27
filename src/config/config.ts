@@ -22,7 +22,7 @@ export default {
     },
     jwt: {
         secret: process.env.JWT_SECRET as string,
-        accessExpiration: process.env.JWT_ACCESS_EXPIRATION as string,
+        accessExpiration: process.env.JWT_ACCESS_EXPIRATION || "1h",
         refreshExpiration: process.env.JWT_REFRESH_EXPIRATION as string
     },
     redis: {

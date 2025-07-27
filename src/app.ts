@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { HealthCheck } from './health/health';
+import authRouther from './routes/auth.routes'
 
 dotenv.config();
 
@@ -10,6 +11,8 @@ app.use(express.json());
 app.use(cors());
 
 const BASE_URL = "/api/v1";
+
+app.use('/register', authRouther)
 
 app.get('/', (req: Request, res: Response) => {
     res.send(`Welcome to TailorCraft Backend..!! 👌`);
