@@ -8,7 +8,7 @@ import { loginSchema, registerSchema, verifyOtpSchema } from '../validation/auth
 
 const router = express.Router();
 
-router.post('/login', rateLimiter, registerController);
+router.post('/register', rateLimiter, registerController);
 router.post('/verify-otp', rateLimiter, verifyOtpController);
 router.post('/login', rateLimiter,  loginController);
 

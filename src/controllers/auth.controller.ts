@@ -4,17 +4,20 @@ import { login, register, verifyOtp } from "../services/auth";
 
 
 export const registerController = async(req: Request, res: Response, next: NextFunction) => {
+    console.log("Request: This is request")
     try {
         const validateData = registerSchema.parse(req.body);
+         console.log("Request:", validateData)
         const user = await register(validateData);
          res.status(200).json({
             success: true,
             message: "Registration was successfull",
             user
         })
+         console.log("Request: ", user)
         return
     } catch (error) {
-        next()
+        next(error)
     }
 }
 

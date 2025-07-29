@@ -1,5 +1,4 @@
 import { PrismaClient, UserRole } from "@prisma/client";
-import { NextFunction, Request, Response } from "express";
 import { ConflictError, UnauthorizedError } from "../utils/error.utils";
 import argon2 from 'argon2'
 import { generateOtp, sendEmail } from "../utils/helpers.utils";
@@ -7,10 +6,10 @@ import config from "../config/config";
 import jwt, { SignOptions } from 'jsonwebtoken'
 
 
-
 const prisma = new PrismaClient();
 
 export const register = async(data: {name: string, email: string, phone: string, password: string, role?: UserRole}) => {
+    console.log("Register user ......")
     const exisingUser = await prisma.user.findUnique({
         where: {email: data.email}
     });
@@ -18,54 +17,61 @@ export const register = async(data: {name: string, email: string, phone: string,
     if(exisingUser){
         throw new ConflictError(`${data.email} already exists`)
     }
+    
+    const existingPending = await prisma.pendingVerification.findUnique({ where: {email: data.email} });
+    if(existingPending){
+        prisma.pendingVerification.delete({ where: { email: data.email } });
+    }
 
     const hashedPassword = await argon2.hash(data.password);
     const otp = generateOtp(config.otp.length);
-    const otpExpires = new Date(Date.now()  + config.otp.expiresInMinutes * 60 * 1000)
+    const otpExpires = new Date(Date.now() + config.otp.expiresInMinutes * 60 * 1000);
 
-    const user = await prisma.user.create({
+    await prisma.pendingVerification.create({
         data: {
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        password: hashedPassword,
-        role: data.role || UserRole.CLIENT,
-        otp, otpExpires
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            password: hashedPassword,
+            role: data.role,
+            otp,
+            otpExpires
         }
     });
+
     await sendEmail({
-        to: user.email,
+        to: data.email,
         subject: "Verify your email",
         html: `Your OTP is ${otp}. It expires in ${config.otp.expiresInMinutes} minutes`
     });
-    return { id: user.id, email: user.email, name: user.name}
+    return { message: "OTP Sent to email"}
 }
 
 
 export const verifyOtp = async(email: string, otp: string) => {
-    const user = await prisma.user.findUnique({where: {email}});
+     const pending = await prisma.pendingVerification.findUnique({ where: { email } });
+    if (!pending) throw new UnauthorizedError("Verification record not found");
 
-    if(!user){
-        throw new UnauthorizedError("User not found")
-    };
+    if (pending.otp !== otp || new Date(pending.otpExpires) < new Date()) {
+        throw new UnauthorizedError("Invalid or expired OTP");
+    }
 
-    if(user.otp !== otp || new Date(user.otpExpires as Date) < new Date()){
-        throw new UnauthorizedError("Invalid or expired OTP")
-    };
-
-    const updateUser = await prisma.user.update({
-        where: {email},
+    const user = await prisma.user.create({
         data: {
-            isVerified: true,
-            otp: null,
-            otpExpires: null
+            name: pending.name,
+            email: pending.email,
+            phone: pending.phone,
+            password: pending.password,
+            role: pending.role,
+            isVerified: true
         }
     });
 
-    const tokens = generateToken(updateUser.id)
-    return { user: updateUser, tokens}
-};
+    await prisma.pendingVerification.delete({ where: { email } });
 
+    const tokens = generateToken(user.id);
+    return { user, tokens };
+};
 
 
 export const login = async (email: string, password: string) => {
@@ -80,9 +86,6 @@ export const login = async (email: string, password: string) => {
     const tokens = generateToken(user.id);
     return {user, tokens}
 }
-
-
-
 
 const generateToken = (userId: string) => {
     const options: SignOptions = {
@@ -103,8 +106,5 @@ const generateToken = (userId: string) => {
     )
     return {accessToken, refreshToken}
 }
-
-
-
 
 

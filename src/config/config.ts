@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 import { PrismaClient } from "@prisma/client"
 dotenv.config();
 
-
 export const prisma = new PrismaClient({
     log: ['query', 'info', 'warn', 'error'],
     datasources: {
@@ -38,14 +37,8 @@ export default {
         apiSecret: process.env.CLOUDINARY_API_SECRET as string,
     },
     email: {
-        smtp: {
-            host: process.env.SMTP_HOST as string,
-            port: Number(process.env.SMTP_PORT),
-            auth: {
-                user: process.env.SMTP_USERNAME as string,
-                pass: process.env.SMTP_PASSWORD as string
-            }
-        },
+        service: process.env.EMAIL_SERVICE as string,
+        apiKey: process.env.SENDGRID_API_KEY as string,
         from: process.env.EMAIL_FROM as string
     },
     otp: {

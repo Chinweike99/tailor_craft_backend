@@ -11,14 +11,12 @@ app.use(express.json());
 app.use(cors());
 
 const BASE_URL = "/api/v1";
-
-app.use('/register', authRouther)
+app.use(`${BASE_URL}/auth`, authRouther);
 
 app.get('/', (req: Request, res: Response) => {
     res.send(`Welcome to TailorCraft Backend..!! 👌`);
 });
 
 app.get(`${BASE_URL}/health`, HealthCheck)
-
 
 export default app;

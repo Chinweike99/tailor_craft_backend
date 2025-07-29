@@ -121,6 +121,18 @@ model User {
   Review                 Review[]
 }
 
+model PendingVerification {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  email      String   @unique
+  phone      String
+  password   String
+  role       UserRole?   @default(CLIENT)
+  otp        String
+  otpExpires DateTime @db.Timestamp(6)
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+}
+
 enum Role {
   CLIENT
   ADMIN
