@@ -10,17 +10,17 @@ const prisma = new PrismaClient();
 
 export const register = async(data: {name: string, email: string, phone: string, password: string, role?: UserRole}) => {
     console.log("Register user ......")
-    const exisingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.user.findUnique({
         where: {email: data.email}
     });
 
-    if(exisingUser){
+    if(existingUser){
         throw new ConflictError(`${data.email} already exists`)
     }
     
     const existingPending = await prisma.pendingVerification.findUnique({ where: {email: data.email} });
     if(existingPending){
-        prisma.pendingVerification.delete({ where: { email: data.email } });
+        await prisma.pendingVerification.delete({ where: { email: data.email } });
     }
 
     const hashedPassword = await argon2.hash(data.password);
@@ -44,7 +44,7 @@ export const register = async(data: {name: string, email: string, phone: string,
         subject: "Verify your email",
         html: `Your OTP is ${otp}. It expires in ${config.otp.expiresInMinutes} minutes`
     });
-    return { message: "OTP Sent to email"}
+    return { message: "OTP Sent to email", data}
 }
 
 
