@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import {  Request, Response } from "express";
 import {z} from 'zod'
 
 export class AppError extends Error {
@@ -68,7 +68,7 @@ export class InternalServerError extends AppError {
 }
 
 
-export const errorHandler = (error: Error, req: Request, res: Response, next: NextFunction)=> {
+export const errorHandler = (error: Error, req: Request, res: Response)=> {
     if(error instanceof AppError){
         return res.status(error.statusCode).json({
             success: false,

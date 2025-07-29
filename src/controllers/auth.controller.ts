@@ -31,7 +31,7 @@ export const verifyOtpController = async(req: Request, res: Response, next: Next
             verified
         })
     } catch (error) {
-        next();
+        next(error);
     }
 }
 
@@ -45,7 +45,7 @@ export const loginController = async(req: Request, res: Response, next: NextFunc
             result
         })
     } catch (error) {
-        
+        next(error);
     }
 }
 

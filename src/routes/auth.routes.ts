@@ -1,8 +1,6 @@
 import express from 'express';
 import { rateLimiter } from '../middleware/rateLimitter.middleware';
-import { validate } from '../middleware/validate.middleware';
 import { loginController, registerController, verifyOtpController } from '../controllers/auth.controller';
-import { loginSchema, registerSchema, verifyOtpSchema } from '../validation/auth';
 
 
 

@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import config from "../config/config";
 import fs from "fs";
-import { UploadedFile } from "../types/utils.types";
+// import { UploadedFile } from "../types/utils.types";
 
 cloudinary.config({
   cloud_name: config.cloudinary.cloudName,
@@ -36,12 +36,12 @@ export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
   await cloudinary.uploader.destroy(publicId);
 };
 
-export const uploadMultipleToCloudinary = async (
-  files: UploadedFile[],
-  folder = "tailorcraft"
-): Promise<Array<{ public_id: string; secure_url: string }>> => {
-  const uploadPromises = files.map((file) =>
-    uploadToCloudinary(file.path, folder)
-  );
-  return Promise.all(uploadPromises);
-};
+// export const uploadMultipleToCloudinary = async (
+//   files: UploadedFile[],
+//   folder = "tailorcraft"
+// ): Promise<Array<{ public_id: string; secure_url: string }>> => {
+//   const uploadPromises = files.map((file) =>
+//     uploadToCloudinary(file.path, folder)
+//   );
+//   return Promise.all(uploadPromises);
+// };

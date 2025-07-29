@@ -1,9 +1,8 @@
-import { NextFunction } from "express"
 import { RateLimitError } from "../utils/error.utils"
 import RedisStore from 'rate-limit-redis';
 import redisClient from "./redis.middleware";
 import rateLimit from "express-rate-limit";
-import { Command } from "ioredis";
+// import { Command } from "ioredis";
 
 
 const windowMs = 15 * 60 * 1000 // 15 minutes
@@ -23,7 +22,7 @@ export const rateLimiter = rateLimit({
 
 export const authRateLimiter = rateLimit({
   windowMs,
-  max: 15, // limit auth endpoints to 5 requests per windowMs
+  max: 15,
   handler: (req, res, next) => {
     next(new RateLimitError());
   },
