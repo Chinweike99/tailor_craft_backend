@@ -1,4 +1,4 @@
-import e, { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema, verifyOtpSchema } from "../validation/auth";
 import { forgotPassword, login, refreshToken, register, resetPassword, verifyOtp } from "../services/auth";
 import { BadRequestError } from "../utils/error.utils";

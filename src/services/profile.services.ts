@@ -1,6 +1,5 @@
 import { Prisma, PrismaClient } from "@prisma/client"
 import { NotFoundError } from "../utils/error.utils";
-import { User } from "../types/types";
 import z from "zod";
 import { updateProfileSchema } from "../validation/profile.validation";
 
