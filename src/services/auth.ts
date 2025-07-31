@@ -108,3 +108,71 @@ const generateToken = (userId: string) => {
 }
 
 
+export const refreshToken = async (refreshToken: string) => {
+    try {
+        const decoded = jwt.verify(refreshToken, config.jwt.secret) as {id: string};
+        const user = await prisma.user.findUnique({ where: {id: decoded.id}});
+        if(!user){
+            throw new UnauthorizedError("User not found")
+        }
+        const tokens = generateToken(user.id);
+        return tokens;
+    } catch (error) {
+        throw new UnauthorizedError(`Invalid refresh token: ${error}`)
+    }
+}
+
+
+export const forgotPassword = async(email: string) => {
+    try {
+        const user = await prisma.user.findUnique({where: {email}});
+        if(!user) {
+            throw new UnauthorizedError("User not found")
+        };
+
+        const otp = generateOtp(config.otp.length);
+        const otpExpires = new Date(Date.now() + config.otp.expiresInMinutes * 60 * 1000);
+        await prisma.user.update({
+            where: {email},
+            data: {otp, otpExpires}
+        });
+
+        await sendEmail({
+            to: email,
+            subject: "Password reset OTP",
+            html: `Your OTP is ${otp}. It expires in ${config.otp.expiresInMinutes} minutes.`,
+        })
+        return {message: "OTP sent to email"}
+
+    } catch (error) {
+        return error
+    }
+}
+
+
+export const resetPassword = async(email: string, otp: string, newPassword: string)=>{
+        const user = await prisma.user.findUnique({where: {email}});
+    if(!user) {
+        throw new UnauthorizedError("User not found")
+    }
+
+    if(!otp || user.otp !==  otp || new Date(user.otpExpires as Date) < new Date()){
+        throw new UnauthorizedError("Invalid or expired OTP")
+    }
+
+    const hashedPassword = await argon2.hash(newPassword);
+
+    await prisma.user.update({
+        where: {email},
+        data: {
+            password: hashedPassword,
+            otp: null,
+            otpExpires: null
+        }
+    });
+
+    return {message: "Password reset successfully"}
+
+}
+
+
