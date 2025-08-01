@@ -55,6 +55,7 @@ export const uploadProfileImageController = async (req: Request, res: Response) 
   const result = await uploadToCloudinary(req.file.path, "/public");
   const profile = await uploadProfileImage(userId as string , result.secure_url);
   res.json(profile);
+  console.log("Image upload successful: ", profile)
 };
 
 
