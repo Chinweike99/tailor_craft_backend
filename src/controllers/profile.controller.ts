@@ -39,7 +39,9 @@ export const updateProfileController = async(req: Request, res: Response, next: 
         })
 
     } catch (error) {
-        next(error)
+        // console.log("Error updating user profile: ", error)
+        // next(error)
+        throw new Error("Internal server error, try authenticating")
     }
 }
 
