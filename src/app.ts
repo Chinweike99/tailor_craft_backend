@@ -7,6 +7,7 @@ import profileRouther from './routes/profile.routes'
 import bookingRouther from './routes/booking.routes'
 import { errorHandler } from './utils/error.utils';
 import adminRouther from './routes/admin/admin.routes'
+import designRouther from './routes/admin/design.routes'
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use(`${BASE_URL}/auth`, authRouther);
 app.use(`${BASE_URL}/profile`, profileRouther);
 app.use(`${BASE_URL}/booking`, bookingRouther);
 app.use(`${BASE_URL}/client`, adminRouther);
+app.use(`${BASE_URL}/design`, designRouther);
 
 app.get('/', (req: Request, res: Response) => {
     res.send(`Welcome to TailorCraft Backend..!! 👌`);
