@@ -14,7 +14,7 @@ export const createBookingSchema = z.object({
     images: z.array(z.string()).min(1),
   }).optional(),
   measurements: measurementSchema,
-  deliveryDate: z.date(),
+  deliveryDate: z.coerce.date(),
   notes: z.string().optional(),
 });
 

@@ -46,7 +46,7 @@ export default {
         expiresInMinutes: 5
     },
     admin: {
-        email: "chinweiketwitter@gmail.com",
+        email: "akwolu.innocent.chinweike@gmail.com",
         name: "Chinweike AKwolu"
     }
 }

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { createBookingSchema, getBookingsSchema, updateBookingStatusSchema } from "../validation/booking.validation";
 import { createBooking, getAdminBookings, getBooking, getBookingById, updateBookingStatus } from "../services/booking.service";
 import { NotFoundError } from "../utils/error.utils";
-import { json } from "zod";
+import { json, ZodError } from "zod";
 
 
 
@@ -20,6 +20,9 @@ export const createBookingController = async(req: Request, res: Response, next: 
             makeBooking
         })
     } catch (error) {
+        if(error instanceof ZodError){
+            res.json(error)
+        }
         next(error)
     }
 };

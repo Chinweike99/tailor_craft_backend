@@ -11,6 +11,13 @@ export const createBooking = async(userId: string, data: BookingCreateInput) => 
         throw new BadRequestError('Either designId or customDesign must be provided');
     }
 
+    const delivery = new Date(deliveryDate);
+    const now = new Date();
+
+    if(delivery < now) {
+        throw new BadRequestError("Delivery date cannot be in the past")
+    }
+
     const booking = await prisma.booking.create({
         data: {
             userId,
