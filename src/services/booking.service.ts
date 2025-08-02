@@ -1,6 +1,6 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Booking, BookingStatus, Prisma, PrismaClient } from "@prisma/client";
 import { BookingCreateInput } from "../types/types";
-import { BadRequestError } from "../utils/error.utils";
+import { BadRequestError, NotFoundError } from "../utils/error.utils";
 
 
 const prisma =  new PrismaClient();
@@ -66,7 +66,87 @@ export const getBooking = async(userId: string, filters: any = {}) =>{
             total,
             page,
             limit,
-            totaoPages: Math.ceil(total / limit)
+            totalPages: Math.ceil(total / limit)
+        }
+    }
+}
+
+
+export const getBookingById = async(userId: string, bookingId: string) => {
+    const getbooking = await prisma.booking.findUnique({
+        where: {id: bookingId},
+        include: {
+            Design: true,
+            Payment: true,
+            Review: true
+        }
+    });
+
+    if(!getbooking){
+        throw new NotFoundError("Booking not found");
+    }
+
+    return getbooking;
+}
+
+
+export const updateBookingStatus = async(bookingId: string, status: BookingStatus, declineReason?: string) => {
+    const booking = await prisma.booking.update({
+        where: {id: bookingId},
+        data: {
+            status,
+            declineReason: status === "DECLINED" ? declineReason: undefined,
+        },
+        include: {
+            User: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    phone: true
+                }
+            },
+            Design: true
+        }
+    });
+    return booking
+}
+
+
+export const getAdminBookings = async(filters: any = {}) => {
+    const {status, page = 1, limit = 10} = filters;
+    const skip = (page - 1) * limit;
+    const where: Prisma.BookingWhereInput = {
+        ...(status && {status})
+    }
+
+    const booking = await prisma.booking.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc'},
+        include: {
+            Design: true,
+            User: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    phone: true
+                }
+            },
+            Payment: true
+        }
+    });
+
+    const total = await prisma.booking.count({where});
+    return {
+        data: booking,
+        meta: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
         }
     }
 }

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { createBookingSchema, getBookingsSchema } from "../validation/booking.validation";
-import { createBooking, getBooking } from "../services/booking.service";
+import { createBookingSchema, getBookingsSchema, updateBookingStatusSchema } from "../validation/booking.validation";
+import { createBooking, getAdminBookings, getBooking, getBookingById, updateBookingStatus } from "../services/booking.service";
 import { NotFoundError } from "../utils/error.utils";
 import { json } from "zod";
 
@@ -44,5 +44,47 @@ export const getBookingController = async(req: Request, res: Response, next: Nex
 } 
 
 
+export const getBookingByIdController = async(req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userId = req.user?.id
+        const bookingId = req.params.id;
+        if(!userId){
+            throw new NotFoundError("User does not exist")
+        }
+        const getbooking = await getBookingById(userId, bookingId);
+        res.status(200).json({message: "success", getbooking})
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const updateBookingStatusController  = async(req: Request, res: Response, next: NextFunction) => {
+    try {
+        const bookingId = req.params.id;
+        const {status, declineReason} = updateBookingStatusSchema.parse(req.body);
+
+        if(!bookingId) {
+            throw new NotFoundError("Booking Not found")
+        }
+
+        const response = await updateBookingStatus(bookingId, status, declineReason)
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+export const getAdminBookingsController  = async(req: Request, res: Response, next: NextFunction) => {
+    try {
+        const filters = getBookingsSchema.parse(req.query)
+        const response = await getAdminBookings(filters);
+        res.status(200).json({
+            message: 'success',
+            response
+        })
+    } catch (error) {
+        next(error)
+    }
+}
 
 
