@@ -6,6 +6,7 @@ import authRouther from './routes/auth.routes'
 import profileRouther from './routes/profile.routes'
 import bookingRouther from './routes/booking.routes'
 import { errorHandler } from './utils/error.utils';
+import adminRouther from './routes/admin/admin.routes'
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ const BASE_URL = "/api/v1";
 app.use(`${BASE_URL}/auth`, authRouther);
 app.use(`${BASE_URL}/profile`, profileRouther);
 app.use(`${BASE_URL}/booking`, bookingRouther);
+app.use(`${BASE_URL}/client`, adminRouther);
 
 app.get('/', (req: Request, res: Response) => {
     res.send(`Welcome to TailorCraft Backend..!! 👌`);
