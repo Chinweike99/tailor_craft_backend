@@ -8,8 +8,10 @@ const prisma = new PrismaClient();
 
 export const createDesign = async(data:any, images: string[]) => {
     const design = await prisma.design.create({
-        ...data,
-        images
+        data: {
+            ...data,
+            images
+        }
     });
     return design;
 }
@@ -72,6 +74,26 @@ export const deleteDesign = async (id: string) => {
 
 
 export const uploadDesignImages = async(files: Express.Multer.File[]) => {
-    const uploadDesign = files.map(file => uploadToCloudinary(file.path, '../../upload'));
+    const uploadDesign = files.map(file => uploadToCloudinary(file.path, 'upload'));
     return Promise.all(uploadDesign)
 }
+
+
+// export const uploadDesignImages = async(files: Express.Multer.File[]) => {
+//     try {
+//         console.log("Starting image uploads, file count:", files.length);
+        
+//         const uploadPromises = files.map((file, index) => {
+//             console.log(`Uploading file ${index + 1}:`, file.originalname, "from path:", file.path);
+//             return uploadToCloudinary(file.path, 'designs');
+//         });
+        
+//         const results = await Promise.all(uploadPromises);
+//         console.log("All uploads completed:", results.length, "files uploaded");
+        
+//         return results;
+//     } catch (error) {
+//         console.error("Error in uploadDesignImages:", error);
+//         throw error;
+//     }
+// }

@@ -5,11 +5,11 @@ export const createDesignSchema = z.object({
      title: z.string().min(3),
     description: z.string().min(10),
     priceRange: z.object({
-    min: z.number().positive(),
-    max: z.number().positive(),
+    min: z.coerce.number().positive(),
+    max: z.coerce.number().positive(),
   }),
   category: z.enum(['NATIVE', 'CASUAL', 'FORMAL']),
-  minimumDeliveryTime: z.number().positive(),
+  minimumDeliveryTime: z.coerce.number().positive(),
   requiredMaterials: z.array(z.string()).min(1),
   isActive: z.boolean().default(true),
 });
