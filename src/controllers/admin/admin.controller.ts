@@ -10,7 +10,6 @@ const getClientsSchema = z.object({
 });
 
 
-
 export const getAllClientsController = async(req: Request, res: Response, next: NextFunction) => {
     try {
         const  filters = getClientsSchema.parse(req.query);
@@ -23,8 +22,6 @@ export const getAllClientsController = async(req: Request, res: Response, next: 
         next(error)
     }
 }
-
-
 
 export const getClientByIdCntroller = async(req: Request, res: Response, next: NextFunction) => {
     try {
