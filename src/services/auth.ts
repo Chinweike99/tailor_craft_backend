@@ -33,7 +33,8 @@ export const register = async(data: {name: string, email: string, phone: string,
             email: data.email,
             phone: data.phone,
             password: hashedPassword,
-            role: data.role,
+            // role: data.role, If you want users to create account as either CLient or Admin
+            role: "CLIENT",
             otp,
             otpExpires
         }

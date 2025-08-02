@@ -70,7 +70,11 @@ export const updateBookingStatusController  = async(req: Request, res: Response,
             throw new NotFoundError("Booking Not found")
         }
 
-        const response = await updateBookingStatus(bookingId, status, declineReason)
+        const response = await updateBookingStatus(bookingId, status, declineReason);
+        res.status(201).json({
+            message: 'success',
+            response
+        })
     } catch (error) {
         next(error)
     }

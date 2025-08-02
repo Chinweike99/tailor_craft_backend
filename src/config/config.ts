@@ -46,7 +46,9 @@ export default {
         expiresInMinutes: 5
     },
     admin: {
-        email: "akwolu.innocent.chinweike@gmail.com",
-        name: "Chinweike AKwolu"
+        email: process.env.ADMIN_EMAIL as string,
+        pass: process.env.ADMIN_PASS as string,
+        phone: process.env.ADMIN_PHONE as string,
+        name: process.env.ADMIN_NAME as string,
     }
 }
