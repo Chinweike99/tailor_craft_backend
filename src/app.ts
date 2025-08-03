@@ -9,13 +9,14 @@ import { errorHandler } from './utils/error.utils';
 import adminRouther from './routes/admin/admin.routes'
 import designRouther from './routes/admin/design.routes'
 import guideRouther from './routes/admin/guide.routes'
+import { setUpDeliveryReminders } from './services/reminder.service';
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-
+setUpDeliveryReminders();
 
 const BASE_URL = "/api/v1";
 app.use(`${BASE_URL}/auth`, authRouther);
@@ -28,7 +29,7 @@ app.use(`${BASE_URL}/guide`, guideRouther);
 app.get('/', (req: Request, res: Response) => {
     res.send(`Welcome to TailorCraft Backend..!! 👌`);
 });
-
+// setUpDeliveryReminders();
 app.get(`${BASE_URL}/health`, HealthCheck)
 app.use(errorHandler);
 

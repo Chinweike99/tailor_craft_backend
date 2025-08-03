@@ -6,7 +6,7 @@ import { sendEmail } from '../utils/helpers.utils';
 
 export const setUpDeliveryReminders = () => {
     // Check daily for bookings with delivery dates in 7, 4, and 1 days
-    cron.schedule('0 9 * * *', async() => {
+    cron.schedule('10 9 * * *', async() => {
         const today = new Date();
         const sevenDaysLater = new Date(today);
         sevenDaysLater.setDate(sevenDaysLater.getDate() + 7);
