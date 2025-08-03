@@ -51,7 +51,7 @@ export const updateGuideController = async(req: Request, res: Response, next: Ne
         const guideId = req.params.id;
         const update = updateGuideSchema.parse(req.body)
         const response = await updateGuide(guideId, update);
-        res.status(200).json({
+         res.status(200).json({
             status: "success",
             response
         })

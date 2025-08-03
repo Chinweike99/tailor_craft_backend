@@ -39,9 +39,9 @@ export const updateProfileController = async(req: Request, res: Response, next: 
         })
 
     } catch (error) {
-        // console.log("Error updating user profile: ", error)
-        // next(error)
-        throw new Error("Internal server error, try authenticating")
+        console.log("Error updating user profile: ", error)
+        next(error)
+       
     }
 }
 
@@ -57,13 +57,3 @@ export const uploadProfileImageController = async (req: Request, res: Response) 
   res.json(profile);
   console.log("Image upload successful: ", profile)
 };
-
-
-
-
-
-
-
-
-
-

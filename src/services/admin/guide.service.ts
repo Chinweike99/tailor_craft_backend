@@ -1,4 +1,4 @@
-import { Guide, Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { NotFoundError } from "../../utils/error.utils";
 
 
@@ -18,7 +18,7 @@ export const getGuide = async(filters: any = {} ) => {
     const {type, page = 1, limit = 10} = filters;
     const skip = (page - 1) * limit
     const where: Prisma.GuideWhereInput = {
-        ...(type && type)
+        ...(type && {type})
     };
     
     const guides = await prisma.guide.findMany({

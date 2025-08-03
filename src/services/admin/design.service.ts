@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { uploadToCloudinary } from "../../utils/cloudinary.utils";
 import { NotFoundError } from "../../utils/error.utils";
+import { Express } from 'express';
 
 
 const prisma = new PrismaClient();

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { createBookingSchema, getBookingsSchema, updateBookingStatusSchema } from "../validation/booking.validation";
 import { createBooking, getAdminBookings, getBooking, getBookingById, updateBookingStatus } from "../services/booking.service";
 import { NotFoundError } from "../utils/error.utils";
-import { json, ZodError } from "zod";
+import { ZodError } from "zod";
 
 
 

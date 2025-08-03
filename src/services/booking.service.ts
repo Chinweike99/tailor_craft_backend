@@ -1,4 +1,4 @@
-import { Booking, BookingStatus, Prisma, PrismaClient } from "@prisma/client";
+import { BookingStatus, Prisma, PrismaClient } from "@prisma/client";
 import { BookingCreateInput } from "../types/types";
 import { BadRequestError, NotFoundError } from "../utils/error.utils";
 

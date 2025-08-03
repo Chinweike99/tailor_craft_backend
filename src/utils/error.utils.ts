@@ -1,4 +1,4 @@
-import {  Request, Response } from "express";
+import {  NextFunction, Request, Response } from "express";
 import {z} from 'zod'
 
 export class AppError extends Error {
@@ -68,7 +68,7 @@ export class InternalServerError extends AppError {
 }
 
 
-export const errorHandler = (error: Error, req: Request, res: Response)=> {
+export const errorHandler = (error: Error, req: Request, res: Response, next: NextFunction)=> {
     if(error instanceof AppError){
         return res.status(error.statusCode).json({
             success: false,
@@ -125,20 +125,13 @@ export const errorHandler = (error: Error, req: Request, res: Response)=> {
       });
     }
     }
-
+    next()
     console.error('Unexpected error:', error);
      return res.status(500).json({
     success: false,
     message: 'Internal Server Error',
     ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
   });
+  
 }
-
-
-
-
-
-
-
-
 
