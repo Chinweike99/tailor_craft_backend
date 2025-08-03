@@ -1,6 +1,8 @@
 import { BookingStatus, Prisma, PrismaClient } from "@prisma/client";
 import { BookingCreateInput } from "../types/types";
 import { BadRequestError, NotFoundError } from "../utils/error.utils";
+import { sendEmail } from "../utils/helpers.utils";
+import config from "../config/config";
 
 
 const prisma =  new PrismaClient();
@@ -41,6 +43,44 @@ export const createBooking = async(userId: string, data: BookingCreateInput) => 
             }
         }
     })
+
+    await sendEmail({
+    to: booking.User.email,
+    subject: "🎉 Booking Confirmed!",
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+        <h2>Hi ${booking.User.name},</h2>
+        <p>🎉 Your booking was successful!</p>
+        <p><strong>Booking ID:</strong> ${booking.id}</p>
+        <p><strong>Delivery Date:</strong> ${delivery.toDateString()}</p>
+        <p>We'll begin tailoring your order shortly. Expect excellence with every stitch.</p>
+        <p>Thank you for choosing us! ✂️</p>
+        <br/>
+        <p>— The TailorCraft Team</p>
+      </div>
+    `
+  });
+
+  // Email to admin
+  await sendEmail({
+    to: config.admin.email,
+    subject: `📥 New Booking from ${booking.User.name}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+        <h3>New Booking Alert 🚨</h3>
+        <p><strong>Client:</strong> ${booking.User.name}</p>
+        <p><strong>Email:</strong> ${booking.User.email}</p>
+        <p><strong>Phone:</strong> ${booking.User.phone || 'N/A'}</p>
+        <p><strong>Design:</strong> ${booking.Design?.title || 'Custom Design'}</p>
+        <p><strong>Delivery Date:</strong> ${delivery.toDateString()}</p>
+        <p><strong>Notes:</strong> ${notes || 'None'}</p>
+        <p>Status: <strong>${booking.status}</strong>, Payment: <strong>${booking.paymentStatus}</strong></p>
+        <br/>
+        <p>— TailorCraft System</p>
+      </div>
+    `
+  });
+
     return booking;
 }
 

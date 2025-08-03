@@ -25,6 +25,7 @@
   "dependencies": {
     "@sendgrid/mail": "^8.1.5",
     "cloudinary": "^2.7.0",
+    "cron": "^4.3.3",
     "dotenv": "^17.2.0",
     "express-rate-limit": "^8.0.1",
     "helmet": "^8.1.0",
