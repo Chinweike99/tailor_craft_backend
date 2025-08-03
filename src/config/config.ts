@@ -28,8 +28,8 @@ export default {
         url: process.env.REDIS_URL as string
     },
     paystack: {
-        secretKey: process.env.PAYSTACK_SECRET_KEY,
-        publicKey: process.env.PAYSTACK_PUBLIC_KEY
+        secretKey: process.env.PAYSTACK_SECRET_KEY as string,
+        publicKey: process.env.PAYSTACK_PUBLIC_KEY as string
     },
     cloudinary: {
         cloudName: process.env.CLOUDINARY_CLOUD_NAME as string,
