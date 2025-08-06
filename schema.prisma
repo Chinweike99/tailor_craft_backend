@@ -19,9 +19,9 @@ model Booking {
   paymentStatus PaymentStatus? @default(UNPAID)
   declineReason String?
   hasReview     Boolean?       @default(false)
-  totalAmount   Float?
   createdAt     DateTime?      @default(now()) @db.Timestamptz(6)
   updatedAt     DateTime?      @default(now()) @db.Timestamptz(6)
+  totalAmount   Int?
   Design        Design?        @relation(fields: [designId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_booking_design")
   User          User           @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_booking_user")
   Payment       Payment[]
@@ -128,7 +128,7 @@ model PendingVerification {
   email      String   @unique
   phone      String
   password   String
-  role       UserRole?   @default(CLIENT)
+  role       String   @default("CLIENT")
   otp        String
   otpExpires DateTime @db.Timestamp(6)
   createdAt  DateTime @default(now()) @db.Timestamp(6)
