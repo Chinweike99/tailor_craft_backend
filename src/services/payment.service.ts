@@ -27,7 +27,6 @@ export const initalizePayment = async(userId: string, bookingId: string, amount:
     if(booking.paymentStatus === "SUCCESS"){
         throw new BadRequestError("Booking already paid")
     }
-
     const payment = await prisma.payment.create({
         data: {
       userId,
@@ -93,9 +92,88 @@ export const initalizePayment = async(userId: string, bookingId: string, amount:
     paymentUrl: response.data?.authorization_url,
     reference: payment.id
   }
-
-
 }
+
+
+export const verifyPayment = async(reference: string) => {
+  const response = await paystack.transaction.verify(reference);
+
+  if (!response.status) {
+    throw new Error("Payment verification failed");
+  }
+
+  const payment = await prisma.payment.findFirst({
+    where: { paymentReference: reference },
+    include: {
+      Booking: true,
+      User: true,
+    },
+  });
+
+  if (!payment) throw new NotFoundError("Payment not found");
+
+  if (payment.status === "SUCCESS") return payment;
+
+  let bookingUpdateData = {};
+  let paymentStatus: PaymentStatus = "SUCCESS";
+
+  if (payment.isInstallment) {
+    const totalPaid = await prisma.payment.aggregate({
+      where: { bookingId: payment.bookingId, status: "SUCCESS" },
+      _sum: { amount: true },
+    });
+
+    const totalAmount = payment.Booking.totalAmount || 0;
+    const paidAmount = (totalPaid._sum.amount || 0) + payment.amount;
+
+    if (paidAmount >= totalAmount * 0.6 && paidAmount < totalAmount) {
+      paymentStatus = "PARTIAL";
+      bookingUpdateData = { paymentStatus: "60$_PAID" };
+    } else if (paidAmount >= totalAmount) {
+      paymentStatus = "SUCCESS";
+      bookingUpdateData = { paymentStatus: "PAID" };
+    }
+  } else {
+    bookingUpdateData = { paymentStatus: "PAID" };
+  }
+
+  const [updatedPayment, updatedBooking] = await prisma.$transaction([
+    prisma.payment.update({
+      where: { id: payment.id },
+      data: { status: paymentStatus },
+    }),
+    prisma.booking.update({
+      where: { id: payment.bookingId },
+      data: bookingUpdateData,
+    }),
+  ]);
+
+  // ✅ Send email to client
+  await sendEmail({
+    to: payment.User.email,
+    subject: "Payment Confirmation",
+    html: `
+      <p>Hi ${payment.User.name},</p>
+      <p>Your payment of <strong>₦${payment.amount}</strong> for booking <strong>#${payment.Booking.id}</strong> has been successfully processed.</p>
+      <p>Thank you for choosing us!</p>
+    `,
+  });
+
+  // ✅ Send email to admin
+  await sendEmail({
+    to: config.admin.email,
+    subject: "Client Payment Notification",
+    html: `
+      <p><strong>${payment.User.name}</strong> has made a payment of <strong>₦${payment.amount}</strong> for booking <strong>#${payment.Booking.id}</strong>.</p>
+      <p>Please check the admin dashboard for details.</p>
+    `,
+  });
+
+  return updatedPayment;
+};
+
+
+
 
 
 

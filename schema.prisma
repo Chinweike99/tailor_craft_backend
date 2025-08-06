@@ -19,6 +19,7 @@ model Booking {
   paymentStatus PaymentStatus? @default(UNPAID)
   declineReason String?
   hasReview     Boolean?       @default(false)
+  totalAmount   Float?
   createdAt     DateTime?      @default(now()) @db.Timestamptz(6)
   updatedAt     DateTime?      @default(now()) @db.Timestamptz(6)
   Design        Design?        @relation(fields: [designId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_booking_design")
