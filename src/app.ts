@@ -10,6 +10,7 @@ import adminRouther from './routes/admin/admin.routes'
 import designRouther from './routes/admin/design.routes'
 import guideRouther from './routes/admin/guide.routes'
 import reviewRouther from './routes/review.routes'
+import paymentRouther from './routes/payment.routes'
 import { setUpDeliveryReminders } from './services/reminder.service';
 
 dotenv.config();
@@ -27,6 +28,7 @@ app.use(`${BASE_URL}/client`, adminRouther);
 app.use(`${BASE_URL}/design`, designRouther);
 app.use(`${BASE_URL}/guide`, guideRouther);
 app.use(`${BASE_URL}/review`, reviewRouther);
+app.use(`${BASE_URL}/payment`, paymentRouther);
 
 app.get('/', (req: Request, res: Response) => {
     res.send(`Welcome to TailorCraft Backend..!! 👌`);

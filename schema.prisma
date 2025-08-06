@@ -158,6 +158,9 @@ enum PaymentStatus {
   UNPAID
   PARTIAL
   SUCCESS
+  REFUNDED
+  PROCESSING
+  PENDING
 }
 
 enum UserRole {

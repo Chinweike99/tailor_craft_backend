@@ -29,7 +29,8 @@ export default {
     },
     paystack: {
         secretKey: process.env.PAYSTACK_SECRET_KEY as string,
-        publicKey: process.env.PAYSTACK_PUBLIC_KEY as string
+        publicKey: process.env.PAYSTACK_PUBLIC_KEY as string,
+        isLive: process.env.PAYSTACK_IS_LIVE === 'true' || false
     },
     cloudinary: {
         cloudName: process.env.CLOUDINARY_CLOUD_NAME as string,
@@ -50,5 +51,11 @@ export default {
         pass: process.env.ADMIN_PASS as string,
         phone: process.env.ADMIN_PHONE as string,
         name: process.env.ADMIN_NAME as string,
-    }
+        accountName: process.env.ADMIN_ACCOUNT_NAME as string, 
+        accountNumber: process.env.ADMIN_ACCOUNT_NUMBER as string,
+        bankCode: process.env.ADMIN_BANK_CODE as string,
+    },
+    frontend: {
+    url: process.env.FRONTEND_URL || 'http://localhost:3000'
+  },
 }
