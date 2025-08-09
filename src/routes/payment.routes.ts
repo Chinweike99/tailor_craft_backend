@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticate } from '../middleware/auth.middleware';
-import { getAllPaymentsController, getPaymentDetailsController, getPaymentHistoryController, getPaymentStatsController, handleWebhookController, InitializePaymentController, verifyPaymentController } from '../controllers/payment.controller';
+import { getAllPaymentsController, getPaymentDetailsController, getPaymentHistoryController, getPaymentStatsController, handleWebhookController, InitializePaymentController, processTestPaymentController, verifyPaymentController } from '../controllers/payment.controller';
 
 
 const router = express.Router();
@@ -23,13 +23,13 @@ router.get('/verify', verifyPaymentController);
 router.use(authenticate);
 
 // Client routes
-router.post('/initialize/:id', InitializePaymentController);
+router.post('/:id', InitializePaymentController);
 router.get('/history', getPaymentHistoryController);
 router.get('/:paymentId', getPaymentDetailsController);
+router.post('/:id/test-charge', processTestPaymentController);
 
 // Admin only routes
-router.get('/admin/all', getAllPaymentsController);
-router.get('/admin/stats', getPaymentStatsController);
-
+router.get('/all-payment', getAllPaymentsController);
+router.get('/stats', getPaymentStatsController);
 
 export default router;

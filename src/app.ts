@@ -17,7 +17,10 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:4000', 'http://localhost:5000'],
+  methods: ['GET', 'POST']
+}));
 setUpDeliveryReminders();
 
 const BASE_URL = "/api/v1";

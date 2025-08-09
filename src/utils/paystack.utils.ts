@@ -6,8 +6,32 @@ import {
   PaystackTransactionData, 
   PaystackInitializeResponse,
   PaystackTransferRecipientData,
-  PaystackTransferData
+  PaystackTransferData,
+  // PaystackChargeResponse
 } from '../types/paystack';
+
+// Add these interfaces to your types/paystack.ts
+interface PaystackChargeData {
+  email: string;
+  amount: number;
+  card: {
+    number: string;
+    cvv: string;
+    expiry_month: string;
+    expiry_year: string;
+  };
+  reference?: string;
+  metadata?: any;
+}
+
+interface PaystackChargeResponse {
+  reference: string;
+  status: string;
+  gateway_response: string;
+  amount: number;
+  authorization_url?: string;
+  display_text?: string;
+}
 
 class PaystackService {
   private api;
@@ -26,7 +50,7 @@ class PaystackService {
   private handleError(error: AxiosError): never {
     if (error.response) {
       const errorMessage = error.response.data || 'Paystack API error';
-      throw new Error(`Paystack Error: ${errorMessage}`);
+      throw new Error(`Paystack Error: ${JSON.stringify(errorMessage)}`);
     } else if (error.request) {
       throw new Error('Network error: Unable to reach Paystack');
     } else {
@@ -34,7 +58,64 @@ class PaystackService {
     }
   }
 
-  // Initialize transaction
+  // Direct card charge for testing
+  async chargeCard(data: PaystackChargeData): Promise<PaystackChargeResponse> {
+    try {
+      const response: AxiosResponse<PaystackResponse<PaystackChargeResponse>> = 
+        await this.api.post('/charge', data);
+      
+      console.log('Charge response:', JSON.stringify(response.data, null, 2));
+      
+      if (!response.data.status) {
+        throw new Error(response.data.message || 'Card charge failed');
+      }
+      
+      return response.data.data;
+    } catch (error) {
+      console.error('Charge error:', error);
+      this.handleError(error as AxiosError);
+    }
+  }
+
+  // Submit PIN for charges that require it
+  async submitPin(reference: string, pin: string): Promise<PaystackChargeResponse> {
+    try {
+      const response: AxiosResponse<PaystackResponse<PaystackChargeResponse>> = 
+        await this.api.post('/charge/submit_pin', {
+          reference,
+          pin
+        });
+      
+      if (!response.data.status) {
+        throw new Error(response.data.message || 'PIN submission failed');
+      }
+      
+      return response.data.data;
+    } catch (error) {
+      this.handleError(error as AxiosError);
+    }
+  }
+
+  // Submit OTP for charges that require it
+  async submitOtp(reference: string, otp: string): Promise<PaystackChargeResponse> {
+    try {
+      const response: AxiosResponse<PaystackResponse<PaystackChargeResponse>> = 
+        await this.api.post('/charge/submit_otp', {
+          reference,
+          otp
+        });
+      
+      if (!response.data.status) {
+        throw new Error(response.data.message || 'OTP submission failed');
+      }
+      
+      return response.data.data;
+    } catch (error) {
+      this.handleError(error as AxiosError);
+    }
+  }
+
+  // Initialize transaction (existing method)
   async initializeTransaction(data: {
     email: string;
     amount: number;
@@ -57,7 +138,7 @@ class PaystackService {
     }
   }
 
-  // Verify transaction
+  // Verify transaction (existing method)
   async verifyTransaction(reference: string): Promise<PaystackTransactionData> {
     try {
       const response: AxiosResponse<PaystackResponse<PaystackTransactionData>> = 
@@ -73,7 +154,7 @@ class PaystackService {
     }
   }
 
-  // Create transfer recipient
+  // Create transfer recipient (existing method)
   async createTransferRecipient(data: {
     type: string;
     name: string;
@@ -95,7 +176,7 @@ class PaystackService {
     }
   }
 
-  // Create transfer
+  // Create transfer (existing method)
   async createTransfer(data: {
     source: string;
     amount: number;
@@ -117,7 +198,7 @@ class PaystackService {
     }
   }
 
-  // List banks
+  // List banks (existing method)
   async listBanks(): Promise<any[]> {
     try {
       const response: AxiosResponse<PaystackResponse<any[]>> = 
@@ -133,7 +214,7 @@ class PaystackService {
     }
   }
 
-  // Resolve bank account
+  // Resolve bank account (existing method)
   async resolveAccountNumber(accountNumber: string, bankCode: string): Promise<{
     account_number: string;
     account_name: string;

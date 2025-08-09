@@ -122,3 +122,12 @@ export interface PaystackTransferData {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface PaystackChargeResponse {
+  reference: string;
+  status: string;
+  gateway_response: string;
+  amount: number;
+  authorization_url?: string;
+  display_text?: string;
+}

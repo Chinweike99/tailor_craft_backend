@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { createReview, getAdminReviews, getReviews } from "../services/review";
-import { createReviewSchema, getReviewsSchema } from "../validation/review";
+import { getReviewsSchema } from "../validation/review";
 import { NotFoundError } from "../utils/error.utils";
 
 

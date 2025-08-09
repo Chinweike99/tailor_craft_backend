@@ -1,65 +1,3 @@
-// import { NextFunction, Request, Response } from 'express';
-// import { success, z } from 'zod';
-// import { getPaymentHistory, handleWebHook, initalizePayment, verifyPayment } from '../services/payment.service';
-// import { NotFoundError } from '../utils/error.utils';
-
-
-// const initializePaymentSchema = z.object({
-// //   bookingId: z.string(),
-//   amount: z.number().positive(),
-//   isInstallment: z.boolean().default(false),
-// });
-
-// export const InitializePaymentController = async(req: Request, res: Response, next: NextFunction) => {
-//     try {
-//         const userId = req.user?.id;
-//         const bookingId = req.params.id;
-//         const {amount, isInstallment} = initializePaymentSchema.parse(req.body);
-
-//         if(!userId){
-//             throw new NotFoundError("InitializePaymentController: Not Found Error")
-//         }
-
-//         const response = await initalizePayment(userId, bookingId, amount, isInstallment);
-//         res.status(201).json({
-//             status: "success",
-//             response
-//         })
-//     } catch (error) {
-//         next(error)
-//     }
-// };
-
-
-// export const verifyPaymentController = async (req: Request, res: Response) => {
-//     console.log("Verify Payment controller")
-//   const { reference } = req.query;
-//   const payment = await verifyPayment(reference as string);
-//   res.json(payment);
-// };
-
-
-// export const handleWebhookController = async (req: Request, res: Response) => {
-//   const result = await handleWebHook(req.body);
-//   res.json(result);
-// };
-
-// export const getPaymentHistoryController = async (req: Request, res: Response, next: NextFunction) => {
-//   try {
-//         const userId = req.user?.id;
-//         if(!userId){
-//             throw new NotFoundError("User Not Found")
-//         }
-//         const payments = await getPaymentHistory(userId);
-//         res.json(payments);
-//   } catch (error) {
-//     next(error)
-//   }
-// };
-
-
-
-
 import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import { 
@@ -68,7 +6,8 @@ import {
   initalizePayment, 
   verifyPayment,
   getAllPayments,
-  getPaymentStats
+  getPaymentStats,
+  processTestPayment
 } from '../services/payment.service';
 import { NotFoundError, UnauthorizedError } from '../utils/error.utils';
 import { PrismaClient } from '@prisma/client';
@@ -79,6 +18,56 @@ const initializePaymentSchema = z.object({
   amount: z.number().positive(),
   isInstallment: z.boolean().default(false),
 });
+
+
+
+
+const testPaymentSchema = z.object({
+  amount: z.number().positive(),
+  isInstallment: z.boolean().default(false),
+  testCardType: z.enum(['SUCCESSFUL_CARD', 'INSUFFICIENT_FUNDS', 'CARD_WITH_PIN', 'INVALID_CARD', 'TIMEOUT_CARD'])
+});
+
+export const processTestPaymentController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Only allow in test environment
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({
+        status: "error",
+        message: "Test payments are not allowed in production"
+      });
+    }
+
+    const userId = req.user?.id;
+    const bookingId = req.params.id;
+    const { amount, isInstallment, testCardType } = testPaymentSchema.parse(req.body);
+
+    if (!userId) {
+      throw new NotFoundError("User not found");
+    }
+
+    const result = await processTestPayment({
+      userId,
+      bookingId,
+      amount,
+      isInstallment,
+      testCardType
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
+
+
+
 
 export const InitializePaymentController = async(req: Request, res: Response, next: NextFunction) => {
   try {

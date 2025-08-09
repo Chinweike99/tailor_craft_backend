@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole } from "@prisma/client";
+import { PrismaClient, Role, UserRole } from "@prisma/client";
 import { ConflictError, UnauthorizedError } from "../utils/error.utils";
 import argon2 from 'argon2'
 import { generateOtp, sendEmail } from "../utils/helpers.utils";
@@ -63,7 +63,7 @@ export const verifyOtp = async(email: string, otp: string) => {
             email: pending.email,
             phone: pending.phone,
             password: pending.password,
-            role: pending.role,
+            role: Role[pending.role as keyof typeof Role],
             isVerified: true
         }
     });
