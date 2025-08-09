@@ -1,5 +1,4 @@
 import express, { Request, Response } from 'express';
-import cors from 'cors';
 import dotenv from 'dotenv';
 import { HealthCheck } from './health/health';
 import authRouther from './routes/auth.routes'
@@ -12,15 +11,13 @@ import guideRouther from './routes/admin/guide.routes'
 import reviewRouther from './routes/review.routes'
 import paymentRouther from './routes/payment.routes'
 import { setUpDeliveryReminders } from './services/reminder.service';
+import { configCors } from './config/cors.config';
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors({
-  origin: ['http://localhost:4000', 'http://localhost:5000'],
-  methods: ['GET', 'POST']
-}));
+app.use(configCors());
 setUpDeliveryReminders();
 
 const BASE_URL = "/api/v1";
