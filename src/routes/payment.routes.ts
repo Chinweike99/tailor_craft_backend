@@ -6,15 +6,6 @@ import { getAllPaymentsController, getPaymentDetailsController, getPaymentHistor
 const router = express.Router();
 
 router.use(authenticate);
-// router.get('/history', getPaymentHistoryController);
-// router.post('/:id', InitializePaymentController);
-// router.get('/:id', verifyPaymentController);
-
-// Webhook doesn't need authentication
-// router.post('/webhook', express.raw({ type: 'application/json' }), handleWebhookController);
-
-
-
 // Public routes
 router.post('/webhook', handleWebhookController);
 router.get('/verify', verifyPaymentController);

@@ -1,9 +1,14 @@
 import { RateLimitError } from "../utils/error.utils"
-import RedisStore from 'rate-limit-redis';
-import redisClient from "./redis.middleware";
+// import RedisStore from 'rate-limit-redis';
+// import redisClient from "./redis.middleware";
 import rateLimit from "express-rate-limit";
 // import { Command } from "ioredis";
 
+
+/**
+ * Keep the Redis Settings
+ * configurations to be used in larger project ..
+ */
 
 const windowMs = 15 * 60 * 1000 // 15 minutes
 
@@ -13,10 +18,10 @@ export const rateLimiter = rateLimit({
     handler: (req, res, next) => {
         next(new RateLimitError())
     },
-    store: new RedisStore({
-        sendCommand: (...args: [string, ...string[]]) => redisClient.call(args[0], ...args.slice(1)) as any,
-        prefix: 'rate-limiter',
-    })
+    // store: new RedisStore({
+    //     sendCommand: (...args: [string, ...string[]]) => redisClient.call(args[0], ...args.slice(1)) as any,
+    //     prefix: 'rate-limiter',
+    // })
 });
 
 
@@ -26,10 +31,10 @@ export const authRateLimiter = rateLimit({
   handler: (req, res, next) => {
     next(new RateLimitError());
   },
-  store: new RedisStore({
-    sendCommand: (...args: [string, ...string[]]) => redisClient.call(args[0], ...args.slice(1)) as any,
-    prefix: 'auth_rate_limit:',
-  }),
+  // store: new RedisStore({
+  //   sendCommand: (...args: [string, ...string[]]) => redisClient.call(args[0], ...args.slice(1)) as any,
+  //   prefix: 'auth_rate_limit:',
+  // }),
 });
 
 

@@ -88,6 +88,25 @@ export const login = async (email: string, password: string) => {
     return {user, tokens}
 }
 
+export const logout = async(token: string) => {
+    console.log("Logout Hit")
+    if(!token) return;
+    const decoded = jwt.decode(token) as { exp?: number };
+    if (!decoded?.exp) return;
+    console.log("Decoded: ", decoded)
+    const expiresAt = new Date(decoded.exp * 1000);
+
+    const data = await prisma.revokedToken.create({
+      data: {
+        token,
+        expiresAt
+      }
+    });
+    console.log("Returned data: ", data)
+    return data;
+    
+}
+
 const generateToken = (userId: string) => {
     const options: SignOptions = {
         expiresIn: config.jwt.accessExpiration as any

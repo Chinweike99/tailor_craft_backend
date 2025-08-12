@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema, verifyOtpSchema } from "../validation/auth";
-import { forgotPassword, login, refreshToken, register, resetPassword, verifyOtp } from "../services/auth";
+import { forgotPassword, login, logout, refreshToken, register, resetPassword, verifyOtp } from "../services/auth";
 import { BadRequestError } from "../utils/error.utils";
 
 
@@ -36,19 +36,64 @@ export const verifyOtpController = async(req: Request, res: Response, next: Next
     }
 }
 
-export const loginController = async(req: Request, res: Response, next: NextFunction) => {
+export const loginController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, password } = loginSchema.parse(req.body);
+    const result = await login(email, password);
+
+    const { accessToken, refreshToken } = result.tokens;
+    res.cookie("auth", accessToken, {
+      httpOnly: true, 
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60, // 1 hour
+    });
+
+    res.cookie("refresh", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 7, 
+    });
+
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const logoutController = async(req: Request, res: Response, next: NextFunction) => {
     try {
-        const {email, password} = loginSchema.parse(req.body);
-        const result = await login(email, password);
-        res.status(200).status(200).json({
+
+        const token = req.cookies?.auth || req.header("Authorization")?.replace("Bearer ", '');
+        console.log("Extracted token:", token);
+        await logout(token)
+        console.log("Logged out: ", token)
+        res.cookie("auth", "", {
+            expires: new Date(0),
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+        res.status(200).json({
             success: true,
-            message: "Login successfull",
-            result
+            message: "Logged out successfully"
         })
     } catch (error) {
+        console.log(error);
         next(error);
     }
 }
+
 
 
 export const refreshTokenController = async(req: Request, res: Response, next: NextFunction) =>{

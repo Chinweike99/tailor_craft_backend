@@ -1,6 +1,6 @@
 import express from 'express';
 import { rateLimiter } from '../middleware/rateLimitter.middleware';
-import { forgotPasswordController, loginController, refreshTokenController, registerController, resetPasswordController, verifyOtpController } from '../controllers/auth.controller';
+import { forgotPasswordController, loginController, logoutController, refreshTokenController, registerController, resetPasswordController, verifyOtpController } from '../controllers/auth.controller';
 
 
 
@@ -11,6 +11,7 @@ router.post('/verify-otp', rateLimiter, verifyOtpController);
 router.post('/login', rateLimiter,  loginController);
 router.post('/refresh-token', refreshTokenController);
 router.post('/forgot-password', rateLimiter, forgotPasswordController);
-router.post('/reset-password', rateLimiter, resetPasswordController)
+router.post('/reset-password', rateLimiter, resetPasswordController);
+router.post('/logout', logoutController)
 
 export default router;

@@ -134,6 +134,13 @@ model PendingVerification {
   createdAt  DateTime @default(now()) @db.Timestamp(6)
 }
 
+model RevokedToken {
+  id        Int      @id @default(autoincrement())
+  token     String
+  expiresAt DateTime @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+}
+
 enum Role {
   CLIENT
   ADMIN

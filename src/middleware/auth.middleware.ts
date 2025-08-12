@@ -10,12 +10,24 @@ import config from '../config/config';
 const prisma = new PrismaClient();
 
 export const authenticate = async(req:Request, res: Response, next: NextFunction) => {
-    const token = req.header("Authorization")?.replace("Bearer ", '');
+    const token = req.cookies?.auth || req.header("Authorization")?.replace("Bearer ", '');
     if(!token) {
         throw new UnauthorizedError("Authentication required");
     }
 
     try {
+
+        const revoked = await prisma.revokedToken.findFirst({
+            where: {
+                token,
+                expiresAt: { gt: new Date() }
+            }
+        });
+
+        if (revoked) {
+            throw new UnauthorizedError("Token has been revoked");
+        }
+
         const decoded = jwt.verify(token, config.jwt.secret) as {id: string};
         const user = await prisma.user.findUnique({
             where: {id: decoded.id},
