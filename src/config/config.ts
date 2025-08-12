@@ -8,7 +8,7 @@ export const prisma = new PrismaClient({
         db: {
             url: process.env.EXTERNAL_DB_URL || "",
         }
-    }
+    },
 })
 
 const env = process.env.NODE_ENV || 'development';
