@@ -60,7 +60,6 @@ export const loginController = async (
       maxAge: 1000 * 60 * 60 * 24 * 7, 
     });
 
-
     res.status(200).json({
       success: true,
       message: "Login successful",
