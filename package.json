@@ -12,6 +12,7 @@
     "build": "prisma generate && tsc",
     "postinstall": "prisma generate",
     "start": "node dist/index.js",
+    "build:render": "tsc && node scripts/fix-imports.cjs",
     "admin": "ts-node --loader ts-node/esm src/admin/createAdmin.ts",
     "db:migrate": "prisma migrate deploy"
   },
