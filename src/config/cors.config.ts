@@ -4,6 +4,7 @@ export const configCors = ()=> {
     return cors({
         origin: (origin, callback) => {
             const allowedOrigins = [
+                "http://localhost:3000",
                 process.env.FRONTEND_PORT1 || "http://localhost:3001",
                 process.env.FRONTEND_PORT2 || "http://localhost:5173",
                 process.env.FRONTEND_DEPLOYED ,
