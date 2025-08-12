@@ -9,11 +9,6 @@ export const prisma = new PrismaClient({
             url: process.env.EXTERNAL_DB_URL || "",
         }
     },
-    __internal: {
-        engine: {
-            connectionLimit: 3, 
-        },
-    },
 })
 
 const env = process.env.NODE_ENV || 'development';
