@@ -14,7 +14,7 @@ router.get('/:id', getDesignByIdController);
 // Admin routes
 router.use(adminOnly);
 router.post('/', upload.array('images', 5), createDesignController);
-router.put('/:id', updateDesignController);
+router.patch('/:id', updateDesignController);
 router.delete('/:id', deleteDesignController);
 
 export default router;
