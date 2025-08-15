@@ -11,8 +11,9 @@ router.get('/', getBookingController);
 router.get('/:id', getBookingByIdController);
 
 // Admin routes
-router.use(adminOnly);
-router.patch('/:id/status', updateBookingStatusController);
-router.get('/admin/all', getAdminBookingsController);
+// router.use(adminOnly);
+router.patch('/:id/status', adminOnly, updateBookingStatusController);
+router.get('/admin/all', adminOnly, getAdminBookingsController);
+
 
 export default router;
