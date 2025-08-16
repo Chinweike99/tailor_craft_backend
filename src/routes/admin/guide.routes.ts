@@ -13,7 +13,7 @@ router.get('/:id', getGuideByIdController);
 // Admin routes
 router.use(adminOnly);
 router.post('/', createGuideController);
-router.put('/:id', updateGuideController);
+router.patch('/:id', updateGuideController);
 router.delete('/:id', deleteGuideController);
 
 export default router;

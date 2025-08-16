@@ -9,7 +9,7 @@ const router = express.Router();
 router.use(authenticate);
 
 router.get('/', getProfileController);
-router.put('/', updateProfileController);
+router.patch('/', updateProfileController);
 router.post('/upload', upload.single('image'), uploadProfileImageController);
 
 export default router;

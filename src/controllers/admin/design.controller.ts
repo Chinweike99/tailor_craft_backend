@@ -1,26 +1,29 @@
 import { NextFunction, Request, Response } from "express";
 import { createDesignSchema, getDesignsSchema, updateDesignSchema } from "../../validation/design";
-import { createDesign, deleteDesign, getDesignById, getDesigns, updateDesign, uploadDesignImages } from "../../services/admin/design.service";
+import { createDesign, deleteDesign, getDesignById, getDesigns, updateDesign } from "../../services/admin/design.service";
 
 
 
 export const createDesignController = async(req: Request, res: Response, next: NextFunction) => {
     console.log("Endpoint is hit")
     try {
-        const validateData  = createDesignSchema.parse(req.body);
-        if(!req.files || !Array.isArray(req.files)){
-            throw new Error("No images uploaded")
+        const validateData = createDesignSchema.parse(req.body);
+    
+        if (!validateData.images || !Array.isArray(validateData.images) || validateData.images.length === 0) {
+            throw new Error("No images provided")
         }
+        
         console.log("Endpoint is hit", validateData)
-        const images = await uploadDesignImages(req.files)
-        console.log("Images is hit", images)
-        const design = await createDesign(validateData, images.map(img => img.secure_url));
-        console.log("Design is hit " + JSON.stringify(design, null, 2));
+        console.log("Images received:", validateData.images)
+        
+        // Use the images directly from the request body (they're already Cloudinary URLs)
+        const design = await createDesign(validateData, validateData.images);
+        console.log("Design created: " + JSON.stringify(design, null, 2));
+        
         res.status(200).json({
             status: "success",
             design
         })
-        console.log(design)
     } catch (error) {
         next(error)
     }

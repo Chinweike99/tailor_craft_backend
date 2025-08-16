@@ -12,6 +12,8 @@ export const createDesignSchema = z.object({
   minimumDeliveryTime: z.coerce.number().positive(),
   requiredMaterials: z.array(z.string()).min(1),
   isActive: z.boolean().default(true),
+  images: z.array(z.string().url()).min(1, "At least one image is required")
+
 });
 
 
