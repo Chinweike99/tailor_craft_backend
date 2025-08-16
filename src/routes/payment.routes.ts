@@ -14,13 +14,13 @@ router.get('/verify', verifyPaymentController);
 router.use(authenticate);
 
 // Client routes
-router.post('/:id', InitializePaymentController);
+
 router.get('/history', getPaymentHistoryController);
-router.get('/:paymentId', getPaymentDetailsController);
-router.post('/:id/test-charge', processTestPaymentController);
 
 // Admin only routes
 router.get('/all-payment', getAllPaymentsController);
 router.get('/stats', getPaymentStatsController);
-
+router.post('/:id', InitializePaymentController);
+router.get('/:paymentId', getPaymentDetailsController);
+router.post('/:id/test-charge', processTestPaymentController);
 export default router;
