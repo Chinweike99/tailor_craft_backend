@@ -38,9 +38,10 @@ export default {
         apiSecret: process.env.CLOUDINARY_API_SECRET as string,
     },
     email: {
-        service: process.env.EMAIL_SERVICE as string,
-        apiKey: process.env.SENDGRID_API_KEY as string,
-        from: process.env.EMAIL_FROM as string
+        service: process.env.EMAIL_SERVICE || "gmail",
+        user: process.env.EMAIL_USER as string,
+        pass: process.env.EMAIL_PASS as string,
+        from: process.env.EMAIL_FROM as string,
     },
     otp: {
         length: 6,
@@ -59,3 +60,4 @@ export default {
     url: process.env.FRONTEND_URL || 'http://localhost:3000'
   },
 }
+
