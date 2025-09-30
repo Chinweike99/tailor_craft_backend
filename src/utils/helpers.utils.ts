@@ -1,18 +1,41 @@
 import crypto from "crypto";
-import sgMail from '@sendgrid/mail';
+import nodemailer from "nodemailer";
 import config from "../config/config";
 import argon2 from "argon2";
 
-// Initialize SendGrid
-sgMail.setApiKey(config.email.apiKey);
+// Initialize 
+// const transporter = nodemailer.createTransport({
+//   service: config.email.service, // "gmail"
+//   auth: {
+//     user: config.email.user,
+//     pass: config.email.pass,
+//   },
+// });
 
-export const debugSendGridSetup = () => {
-  console.log('=== SendGrid Configuration Debug ===');
-  console.log('API Key exists:', !!config.email.apiKey);
-  console.log('API Key format:', config.email.apiKey?.substring(0, 10) + '...');
-  console.log('From email:', config.email.from);
-  console.log('Email service:', config.email.service);
-  console.log('=====================================');
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587, // secure SSL
+  secure: false, 
+  auth: {
+    user: config.email.user,
+    pass: config.email.pass,
+  },
+});
+
+
+export const debugGmailSetup = async () => {
+  console.log("=== Gmail Configuration Debug ===");
+  console.log("Service:", config.email.service);
+  console.log("User exists:", !!config.email.user);
+  console.log("From email:", config.email.from);
+
+  try {
+    await transporter.verify();
+    console.log("Transporter is ready to send emails ✅");
+  } catch (err) {
+    console.error("Transporter verification failed ❌", err);
+  }
+  console.log("===================================");
 };
 
 
@@ -38,21 +61,21 @@ export const sendEmail = async ({
   text?: string;
 }) => {
   try {
+    await debugGmailSetup();
 
-    debugSendGridSetup();
-    const msg = {
-      to,
+    const mailOptions = {
       from: config.email.from,
+      to,
       subject,
-      html,
       text,
+      html,
     };
 
-    await sgMail.send(msg);
+    await transporter.sendMail(mailOptions);
     console.log(`Email sent successfully to ${to}`);
   } catch (error) {
-    console.error('Email sending failed:', error);
-    throw new Error('Failed to send email');
+    console.error("Email sending failed:", error);
+    throw new Error("Failed to send email");
   }
 };
 
