@@ -1,13 +1,7 @@
-import { PrismaClient } from '@prisma/client'
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken'
 import { UnauthorizedError } from '../utils/error.utils';
-import config from '../config/config';
-
-
-
-
-const prisma = new PrismaClient();
+import config, { prisma } from '../config/config';
 
 export const authenticate = async(req:Request, res: Response, next: NextFunction) => {
     const token = req.cookies?.auth || req.header("Authorization")?.replace("Bearer ", '');

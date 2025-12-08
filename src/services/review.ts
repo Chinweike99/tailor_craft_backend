@@ -1,9 +1,6 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { BadRequestError, NotFoundError } from "../utils/error.utils";
-
-
-
-const prisma = new PrismaClient()
+import { prisma } from "../config/config";
 
 
 export const createReview = async(userId: string, bookingId: string, rating: number, comment: string) => {

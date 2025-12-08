@@ -1,12 +1,10 @@
-import { PrismaClient, PaymentStatus } from '@prisma/client';
-import config from '../config/config';
+import { PaymentStatus } from '@prisma/client';
+import config, { prisma } from '../config/config';
 import { BadRequestError, NotFoundError } from '../utils/error.utils';
 import { sendEmail } from '../utils/helpers.utils';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 import PaystackService from '../utils/paystack.utils';
-
-const prisma = new PrismaClient();
 
 
 // Create transfer recipient for admin account

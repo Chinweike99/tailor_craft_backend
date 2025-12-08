@@ -1,10 +1,8 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { uploadToCloudinary } from "../../utils/cloudinary.utils";
 import { NotFoundError } from "../../utils/error.utils";
 import { Express } from 'express';
-
-
-const prisma = new PrismaClient();
+import { prisma } from "../../config/config";
 
 
 export const createDesign = async(data:any, images: string[]) => {

@@ -1,8 +1,6 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { NotFoundError } from "../../utils/error.utils";
-
-
-const prisma = new PrismaClient();
+import { prisma } from "../../config/config";
 
 export const createGuide = async(data: Prisma.GuideCreateInput) => {
     const guide = await prisma.guide.create({
