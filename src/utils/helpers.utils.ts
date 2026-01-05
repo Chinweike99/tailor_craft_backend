@@ -12,34 +12,78 @@ import argon2 from "argon2";
 //   },
 // });
 
-// Try port 465 (SSL) for better compatibility with cloud hosting providers
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // Use SSL
-  auth: {
-    user: config.email.user,
-    pass: config.email.pass,
-  },
-  // Add timeout and connection settings for Render
-  connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
-});
+// Create transporter based on email service
+const createTransporter = () => {
+  const service = config.email.service?.toLowerCase() || 'gmail';
+  
+  // Brevo (formerly Sendinblue) - 300 emails/day free
+  if (service === 'brevo' || service === 'sendinblue') {
+    return nodemailer.createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      secure: false, // Use STARTTLS
+      auth: {
+        user: process.env.BREVO_SMTP_USER as string,
+        pass: process.env.BREVO_API_KEY as string,
+      },
+    });
+  }
+  
+  // Resend - 100 emails/day free
+  if (service === 'resend') {
+    return nodemailer.createTransport({
+      host: "smtp.resend.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "resend",
+        pass: process.env.RESEND_API_KEY as string,
+      },
+    });
+  }
+  
+  // SendGrid - 100 emails/day free
+  if (service === 'sendgrid') {
+    return nodemailer.createTransport({
+      host: "smtp.sendgrid.net",
+      port: 465,
+      secure: true,
+      auth: {
+        user: "apikey",
+        pass: process.env.SENDGRID_API_KEY as string,
+      },
+    });
+  }
+  
+  // Gmail - Works locally, blocked on cloud platforms
+  return nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: config.email.user,
+      pass: config.email.pass,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+  });
+};
+
+const transporter = createTransporter();
 
 
 export const debugGmailSetup = async () => {
-  console.log("=== Gmail Configuration Debug ===");
+  console.log("=== Email Configuration Debug ===");
   console.log("Service:", config.email.service);
-  console.log("User exists:", !!config.email.user);
+  console.log("User/API exists:", !!(config.email.user || process.env.BREVO_API_KEY || process.env.RESEND_API_KEY));
   console.log("From email:", config.email.from);
 
   try {
     await transporter.verify();
-    console.log("Transporter is ready to send emails ✅");
+    console.log("✅ Email transporter is ready");
   } catch (err) {
-    console.error("Transporter verification failed ❌", err);
-    // Don't throw, just log - verification can be done separately
+    console.error("❌ Email transporter verification failed:", err);
   }
   console.log("===================================");
 };
