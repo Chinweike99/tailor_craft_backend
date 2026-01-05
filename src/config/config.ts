@@ -10,6 +10,17 @@ if (!DATABASE_URL) {
   throw new Error('DATABASE_URL or EXTERNAL_DB_URL must be set in .env file');
 }
 
+// Validate email configuration
+if (!process.env.EMAIL_USER) {
+  console.warn('⚠️  WARNING: EMAIL_USER is not set - email functionality will not work');
+}
+if (!process.env.EMAIL_PASS) {
+  console.warn('⚠️  WARNING: EMAIL_PASS is not set - email functionality will not work');
+}
+if (!process.env.EMAIL_FROM) {
+  console.warn('⚠️  WARNING: EMAIL_FROM is not set - using EMAIL_USER as fallback');
+}
+
 // Create Prisma Client - Prisma 6 works great with Neon directly
 export const prisma = new PrismaClient({
   log: process.env.NODE_ENV === 'development' 
@@ -62,7 +73,7 @@ export default {
         service: process.env.EMAIL_SERVICE || "gmail",
         user: process.env.EMAIL_USER as string,
         pass: process.env.EMAIL_PASS as string,
-        from: process.env.EMAIL_FROM as string,
+        from: process.env.EMAIL_FROM || process.env.EMAIL_USER as string,
     },
     otp: {
         length: 6,

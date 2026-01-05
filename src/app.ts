@@ -11,6 +11,7 @@ import guideRouther from './routes/admin/guide.routes'
 import reviewRouther from './routes/review.routes'
 import paymentRouther from './routes/payment.routes'
 import { setUpDeliveryReminders } from './services/reminder.service';
+import { setupKeepAlive } from './services/keep-alive.service';
 import { configCors } from './config/cors.config';
 
 dotenv.config();
@@ -19,6 +20,7 @@ const app = express();
 app.use(express.json());
 app.use(configCors());
 setUpDeliveryReminders();
+setupKeepAlive();
 
 const BASE_URL = "/api/v1";
 app.use(`${BASE_URL}/auth`, authRouther);
