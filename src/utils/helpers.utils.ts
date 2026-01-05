@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import config from "../config/config";
 import argon2 from "argon2";
 
@@ -111,7 +112,30 @@ export const sendEmail = async ({
   text?: string;
 }) => {
   try {
-    // Only verify in development to avoid timeout on every email
+    const service = config.email.service?.toLowerCase() || 'gmail';
+    
+    // Use Resend HTTP API (bypasses SMTP blocking on Render)
+    if (service === 'resend' && process.env.RESEND_API_KEY) {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      
+      const { data, error } = await resend.emails.send({
+        from: config.email.from || 'onboarding@resend.dev',
+        to: [to],
+        subject,
+        html,
+        text,
+      });
+
+      if (error) {
+        console.error("Resend API error:", error);
+        throw new Error(`Resend error: ${error.message}`);
+      }
+
+      console.log(`✅ Email sent successfully via Resend to ${to}`, data);
+      return;
+    }
+
+    // Fallback to SMTP for other services
     if (process.env.NODE_ENV === 'development') {
       await debugGmailSetup();
     }
@@ -129,6 +153,8 @@ export const sendEmail = async ({
   } catch (error) {
     console.error("Email sending failed:", error);
     console.error("Email config status:", {
+      service: config.email.service,
+      hasResendKey: !!process.env.RESEND_API_KEY,
       hasEmailUser: !!config.email.user,
       hasEmailPass: !!config.email.pass,
       emailFrom: config.email.from,
