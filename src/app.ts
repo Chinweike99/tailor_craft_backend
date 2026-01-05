@@ -17,6 +17,10 @@ import { configCors } from './config/cors.config';
 dotenv.config();
 
 const app = express();
+
+// Trust proxy - Required for Render, Heroku, etc.
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(configCors());
 setUpDeliveryReminders();
