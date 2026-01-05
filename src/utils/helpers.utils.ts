@@ -75,7 +75,15 @@ export const sendEmail = async ({
     console.log(`Email sent successfully to ${to}`);
   } catch (error) {
     console.error("Email sending failed:", error);
-    throw new Error("Failed to send email");
+    console.error("Email config status:", {
+      hasEmailUser: !!config.email.user,
+      hasEmailPass: !!config.email.pass,
+      emailFrom: config.email.from,
+      targetEmail: to
+    });
+    // Provide more detailed error information
+    const errorMessage = error instanceof Error ? error.message : "Unknown email error";
+    throw new Error(`Failed to send email: ${errorMessage}`);
   }
 };
 
