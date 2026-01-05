@@ -12,14 +12,19 @@ import argon2 from "argon2";
 //   },
 // });
 
+// Try port 465 (SSL) for better compatibility with cloud hosting providers
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 587, // secure SSL
-  secure: false, 
+  port: 465,
+  secure: true, // Use SSL
   auth: {
     user: config.email.user,
     pass: config.email.pass,
   },
+  // Add timeout and connection settings for Render
+  connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
 
@@ -34,6 +39,7 @@ export const debugGmailSetup = async () => {
     console.log("Transporter is ready to send emails ✅");
   } catch (err) {
     console.error("Transporter verification failed ❌", err);
+    // Don't throw, just log - verification can be done separately
   }
   console.log("===================================");
 };
@@ -61,7 +67,10 @@ export const sendEmail = async ({
   text?: string;
 }) => {
   try {
-    await debugGmailSetup();
+    // Only verify in development to avoid timeout on every email
+    if (process.env.NODE_ENV === 'development') {
+      await debugGmailSetup();
+    }
 
     const mailOptions = {
       from: config.email.from,
