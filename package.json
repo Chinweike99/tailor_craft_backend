@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/Chinweike99/tailor_craft_backend#readme",
   "dependencies": {
+    "@prisma/client": "^6.8.1",
     "@sendgrid/mail": "^8.1.5",
     "axios": "^1.11.0",
     "cloudinary": "^2.7.0",
@@ -42,6 +43,7 @@
     "nodemon": "^3.1.10",
     "paystack": "^2.0.1",
     "paystack-api": "^2.0.6",
+    "prisma": "^6.8.1",
     "rate-limit-redis": "^4.2.1",
     "redis": "^5.6.0",
     "uuid": "^11.1.0",
@@ -49,7 +51,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",
-    "@prisma/client": "^6.12.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/helmet": "^0.0.48",
@@ -60,6 +61,7 @@
     "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^6.4.17",
     "@types/paystack": "^2.0.4",
+    "@types/pg": "^8.15.6",
     "@typescript-eslint/eslint-plugin": "^8.37.0",
     "@typescript-eslint/parser": "^8.37.0",
     "argon2": "^0.43.1",
@@ -70,7 +72,6 @@
     "globals": "^16.3.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
-    "prisma": "^6.12.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

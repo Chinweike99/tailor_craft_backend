@@ -1,12 +1,10 @@
-import { PrismaClient, Role, UserRole } from "@prisma/client";
+import { Role, UserRole } from "@prisma/client";
 import { ConflictError, UnauthorizedError } from "../utils/error.utils";
 import argon2 from 'argon2'
 import { generateOtp, sendEmail } from "../utils/helpers.utils";
 import config from "../config/config";
-import jwt, { SignOptions } from 'jsonwebtoken'
-
-
-const prisma = new PrismaClient();
+import { prisma } from "../config/database";
+import jwt, { SignOptions } from 'jsonwebtoken';
 
 export const register = async(data: {name: string, email: string, phone: string, password: string, role?: UserRole}) => {
     console.log("Register user ......")

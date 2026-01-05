@@ -1,8 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { NotFoundError } from "../../utils/error.utils";
-
-
-const prisma = new PrismaClient();
+import { prisma } from "../../config/database";
 
 export const getAllClients = async(filters: any ) => {
     const {page = 1, limit = 10} = filters;

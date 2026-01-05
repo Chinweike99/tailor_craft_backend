@@ -1,23 +1,44 @@
 import dotenv from 'dotenv';
-import { PrismaClient } from "@prisma/client"
 dotenv.config();
 
+import { PrismaClient } from "@prisma/client"
+
+// Validate required environment variables
+const DATABASE_URL = process.env.DATABASE_URL || process.env.EXTERNAL_DB_URL;
+
+if (!DATABASE_URL) {
+  throw new Error('DATABASE_URL or EXTERNAL_DB_URL must be set in .env file');
+}
+
+// Create Prisma Client - Prisma 6 works great with Neon directly
 export const prisma = new PrismaClient({
-    log: ['query', 'info', 'warn', 'error'],
-    datasources: {
-        db: {
-            url: process.env.EXTERNAL_DB_URL || "",
-        }
-    },
-})
+  log: process.env.NODE_ENV === 'development' 
+    ? ['query', 'info', 'warn', 'error'] 
+    : ['error'],
+});
+
+// Test the connection
+prisma.$connect()
+  .then(() => console.log('✅ Database connected successfully'))
+  .catch((err) => {
+    console.error('❌ Database connection failed:', err.message);
+    process.exit(1);
+  });
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  await prisma.$disconnect();
+  process.exit(0);
+});
 
 const env = process.env.NODE_ENV || 'development';
-const port = process.env.port || 5000;
+const port = process.env.PORT || 5000;
 
 export default {
-    env, port,
+    env, 
+    port,
     database: {
-        url: process.env.EXTERNAL_DB_URL || ""
+        url: DATABASE_URL
     },
     jwt: {
         secret: process.env.JWT_SECRET as string,
@@ -30,7 +51,7 @@ export default {
     paystack: {
         secretKey: process.env.PAYSTACK_SECRET_KEY as string,
         publicKey: process.env.PAYSTACK_PUBLIC_KEY as string,
-        isLive: process.env.PAYSTACK_IS_LIVE === 'true' || false
+        isLive: process.env.PAYSTACK_IS_LIVE === 'true'
     },
     cloudinary: {
         cloudName: process.env.CLOUDINARY_CLOUD_NAME as string,
@@ -57,7 +78,6 @@ export default {
         bankCode: process.env.ADMIN_BANK_CODE as string,
     },
     frontend: {
-    url: process.env.FRONTEND_URL || 'http://localhost:3000'
-  },
+        url: process.env.FRONTEND_URL || 'http://localhost:3000'
+    },
 }
-

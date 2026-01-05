@@ -1,13 +1,11 @@
-import { Prisma, PrismaClient } from "@prisma/client"
+import { Prisma } from "@prisma/client"
 import { NotFoundError } from "../utils/error.utils";
 import z from "zod";
 import { updateProfileSchema } from "../validation/profile.validation";
+import { prisma } from "../config/database";
 
 
 type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
-
-
-const prisma = new PrismaClient();
 
 
 export const getProfile = async (userId: string) => {
