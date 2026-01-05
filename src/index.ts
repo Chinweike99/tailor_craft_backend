@@ -12,9 +12,6 @@ const start = async () => {
         await prisma.$connect();
         console.log("Successfully connected to database via prisma");
 
-        await prisma.$queryRaw`SELECT 1`;
-        console.log('Database connection verified');
-
         app.listen(port, () => {
         console.log(`Server running on port http://localhost:${port}`)
     })

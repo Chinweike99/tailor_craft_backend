@@ -2,7 +2,8 @@ import { BookingStatus, Prisma } from "@prisma/client";
 import { BookingCreateInput } from "../types/types";
 import { BadRequestError, NotFoundError } from "../utils/error.utils";
 import { sendEmail } from "../utils/helpers.utils";
-import config, { prisma } from "../config/config";
+import config from "../config/config";
+import { prisma } from "../config/database";
 
 export const createBooking = async(userId: string, data: BookingCreateInput) => {
     const { designId, customDesign, measurements, deliveryDate, notes  } = data;

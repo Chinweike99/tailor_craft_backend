@@ -1,4 +1,5 @@
-import config, { prisma } from "../config/config"
+import config from "../config/config";
+import { prisma } from "../config/database";
 import { ConflictError } from "../utils/error.utils";
 import argon2 from 'argon2'
 

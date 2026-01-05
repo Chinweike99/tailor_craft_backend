@@ -1,10 +1,7 @@
 import dotenv from 'dotenv';
-dotenv.config(); // Load environment variables first
+dotenv.config();
 
 import { PrismaClient } from "@prisma/client"
-import { PrismaPg } from '@prisma/adapter-pg';
-import pkg from 'pg';
-const { Pool } = pkg;
 
 // Validate required environment variables
 const DATABASE_URL = process.env.DATABASE_URL || process.env.EXTERNAL_DB_URL;
@@ -13,16 +10,11 @@ if (!DATABASE_URL) {
   throw new Error('DATABASE_URL or EXTERNAL_DB_URL must be set in .env file');
 }
 
-// Create the connection pool
-const pool = new Pool({ connectionString: DATABASE_URL });
-const adapter = new PrismaPg(pool);
-
-// Create Prisma Client with the adapter
+// Create Prisma Client - Prisma 6 works great with Neon directly
 export const prisma = new PrismaClient({
   log: process.env.NODE_ENV === 'development' 
     ? ['query', 'info', 'warn', 'error'] 
     : ['error'],
-  adapter,
 });
 
 // Test the connection
@@ -36,7 +28,6 @@ prisma.$connect()
 // Graceful shutdown
 process.on('SIGINT', async () => {
   await prisma.$disconnect();
-  await pool.end();
   process.exit(0);
 });
 

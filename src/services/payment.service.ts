@@ -1,5 +1,6 @@
 import { PaymentStatus } from '@prisma/client';
-import config, { prisma } from '../config/config';
+import config from '../config/config';
+import { prisma } from '../config/database';
 import { BadRequestError, NotFoundError } from '../utils/error.utils';
 import { sendEmail } from '../utils/helpers.utils';
 import { v4 as uuidv4 } from 'uuid';

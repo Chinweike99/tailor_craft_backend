@@ -10,7 +10,7 @@ import {
   processTestPayment
 } from '../services/payment.service';
 import { NotFoundError, UnauthorizedError } from '../utils/error.utils';
-import { prisma } from '../config/config';
+import { prisma } from '../config/database';
 
 const initializePaymentSchema = z.object({
   amount: z.number().positive(),

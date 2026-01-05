@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { uploadToCloudinary } from "../../utils/cloudinary.utils";
 import { NotFoundError } from "../../utils/error.utils";
 import { Express } from 'express';
-import { prisma } from "../../config/config";
+import { prisma } from "../../config/database";
 
 
 export const createDesign = async(data:any, images: string[]) => {

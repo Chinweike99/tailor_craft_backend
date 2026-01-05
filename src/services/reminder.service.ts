@@ -1,5 +1,6 @@
 import cron from 'node-cron'
-import config, { prisma } from '../config/config';
+import config from '../config/config';
+import { prisma } from '../config/database';
 import { sendEmail } from '../utils/helpers.utils';
 // import { SendEmail } from '../utils/email';
 

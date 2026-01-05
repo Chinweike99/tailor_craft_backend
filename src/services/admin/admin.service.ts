@@ -1,5 +1,5 @@
 import { NotFoundError } from "../../utils/error.utils";
-import { prisma } from "../../config/config";
+import { prisma } from "../../config/database";
 
 export const getAllClients = async(filters: any ) => {
     const {page = 1, limit = 10} = filters;
