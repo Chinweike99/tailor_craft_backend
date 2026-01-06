@@ -1,5 +1,11 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 
+// Determine the correct server URL based on environment
+const isDevelopment = process.env.NODE_ENV === 'development';
+const baseUrl = isDevelopment 
+  ? 'http://localhost:4000'
+  : (process.env.RENDER_EXTERNAL_URL || 'https://tailorcraft.onrender.com');
+
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
@@ -18,8 +24,8 @@ const swaggerDefinition = {
       - **Automated Services**: Background jobs for cleanup, reminders, and keep-alive
       
       ### Base URL
-      - **Development**: http://localhost:4000/api-docs/
-      - **Production**: https://tailorcraft.onrender.com/api-docs/
+      - **Development**: http://localhost:4000/api/v1
+      - **Production**: https://tailorcraft.onrender.com/api/v1
       
       ### Authentication
       Most endpoints require authentication. Include the JWT token in the Authorization header:
@@ -42,12 +48,8 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:4000/api/v1',
-      description: 'Development Server',
-    },
-    {
-      url: 'https://tailor-craft-backend.onrender.com/api/v1',
-      description: 'Production Server',
+      url: `${baseUrl}/api/v1`,
+      description: isDevelopment ? 'Development Server' : 'Production Server',
     },
   ],
   tags: [
