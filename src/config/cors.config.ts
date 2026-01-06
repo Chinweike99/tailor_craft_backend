@@ -6,6 +6,8 @@ export const configCors = ()=> {
             const allowedOrigins = [
                 "http://localhost:3000",
                 "http://localhost:3001",
+                "http://localhost:4000",
+                "https://tailorcraft.onrender.com",
                 process.env.FRONTEND_PORT1 || "https://tailorcraft.netlify.app",
                 "https://tailor-craft-jet.vercel.app",
                 process.env.FRONTEND_PORT3 || "http://localhost:5173",
