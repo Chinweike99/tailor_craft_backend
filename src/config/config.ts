@@ -63,7 +63,7 @@ export default {
           from: process.env.EMAIL_FROM || "no-reply@example.com",
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PASS,
-          service: process.env.EMAIL_SERVICE || "brevo",
+          service: process.env.EMAIL_SERVICE || "resend",
     },
     otp: {
         length: 6,
