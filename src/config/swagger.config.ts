@@ -4,7 +4,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 const baseUrl = isDevelopment
-  ? 'http://localhost:4000'
+  ? 'https://tailorcraft.onrender.com'
   : 'https://tailorcraft.onrender.com';
 
 const swaggerDefinition = {
