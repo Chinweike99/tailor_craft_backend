@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import config from "../config/config";
+import SibApiV3Sdk from "sib-api-v3-sdk";
 
 type EmailPayload = {
   to: string;
@@ -8,51 +9,33 @@ type EmailPayload = {
   text?: string;
 };
 
+const isDev = config.env === "development";
+
 /* -------------------------------
-   UNIFIED SMTP TRANSPORTER
-   Works for both dev and prod using Brevo
+   DEV: SMTP (local only)
 -------------------------------- */
-const createTransporter = () => {
-  const service = config.email.service?.toLowerCase();
+let devTransporter: nodemailer.Transporter | null = null;
 
-  // Brevo (Sendinblue) SMTP
-  if (service === 'brevo' || service === 'sendinblue') {
-    return nodemailer.createTransport({
-      host: "smtp-relay.brevo.com",
-      port: 587,
-      secure: false, // use TLS
-      auth: {
-        user: process.env.BREVO_SMTP_USER || config.email.user,
-        pass: process.env.BREVO_SMTP_KEY || config.email.pass,
-      },
-    });
-  }
-
-  // Gmail fallback
-  return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
+if (isDev && config.email.user && config.email.pass) {
+  devTransporter = nodemailer.createTransport({
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false,
     auth: {
-      user: config.email.user,
-      pass: config.email.pass,
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
     },
   });
-};
-
-const transporter = createTransporter();
+}
 
 /* -------------------------------
-   VERIFY EMAIL CONFIGURATION
+   PROD: BREVO HTTP API
 -------------------------------- */
-export const verifyEmailConfig = async () => {
-  try {
-    await transporter.verify();
-    console.log(`✅ Email service (${config.email.service}) is ready`);
-  } catch (err) {
-    console.error("❌ Email verification failed:", err);
-  }
-};
+const brevoClient = SibApiV3Sdk.ApiClient.instance;
+brevoClient.authentications["api-key"].apiKey =
+  process.env.BREVO_API_KEY!;
+
+const transactionalApi = new SibApiV3Sdk.TransactionalEmailsApi();
 
 /* -------------------------------
    SEND EMAIL
@@ -64,22 +47,32 @@ export const sendEmail = async ({
   text,
 }: EmailPayload) => {
   try {
-    await transporter.sendMail({
-      from: config.email.from,
-      to,
+    if (isDev && devTransporter) {
+      await devTransporter.sendMail({
+        from: config.email.from,
+        to,
+        subject,
+        html,
+        text,
+      });
+
+      console.log(` [DEV] Email sent to ${to}`);
+      return;
+    }
+
+    await transactionalApi.sendTransacEmail({
+      sender: {
+        email: config.email.from,
+        name: "TailorCraft",
+      },
+      to: [{ email: to }],
       subject,
-      html,
-      text,
+      htmlContent: html,
+      textContent: text,
     });
 
-    console.log(`📧 Email sent successfully to ${to}`);
+    console.log(`📧 [PROD] Email sent to ${to}`);
   } catch (err) {
     console.error("❌ Email failed:", err);
-    console.error("Email config:", {
-      service: config.email.service,
-      from: config.email.from,
-      to,
-    });
-    // Log but don't throw to prevent registration failures
   }
 };
