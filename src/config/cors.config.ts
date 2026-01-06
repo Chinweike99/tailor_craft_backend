@@ -16,9 +16,8 @@ export const configCors = ()=> {
                 process.env.FRONTEND_DEPLOYED,
                 process.env.FRONTEND_DOMAIN,
                 process.env.RENDER_EXTERNAL_URL
-            ].filter(Boolean); // Remove undefined values
+            ].filter(Boolean); 
             
-            // Allow requests with no origin (like mobile apps, Postman, or same-origin)
             if(!origin || allowedOrigins.includes(origin)){
                 callback(null, true);
             }else{
