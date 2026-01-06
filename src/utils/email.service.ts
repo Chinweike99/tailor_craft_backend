@@ -74,6 +74,5 @@ export const sendEmail = async ({
     console.log(`📧 [PROD] Email sent to ${to}`);
   } catch (err) {
     console.error("❌ Email failed:", err);
-    // DO NOT throw — email is a side effect
   }
 };
