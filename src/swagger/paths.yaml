@@ -1,0 +1,1327 @@
+paths:
+  # ==========================================
+  # AUTHENTICATION ENDPOINTS
+  # ==========================================
+  
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Creates a new user account and sends a verification OTP to the provided email address.
+      operationId: register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Registration successful, OTP sent to email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Email already exists
+                statusCode: 409
+        '429':
+          description: Too many requests - rate limit exceeded
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /auth/verify-otp:
+    post:
+      tags:
+        - Authentication
+      summary: Verify OTP and activate account
+      description: Verifies the OTP sent to the user's email and activates their account. Returns JWT tokens upon successful verification.
+      operationId: verifyOTP
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOTPRequest'
+      responses:
+        '200':
+          description: OTP verified successfully, account activated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Invalid or expired OTP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: Invalid or expired OTP
+                statusCode: 401
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticates a user with email and password, returns JWT access and refresh tokens.
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Invalid credentials or unverified email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalidCredentials:
+                  value:
+                    message: Invalid email or password
+                    statusCode: 401
+                unverified:
+                  value:
+                    message: Please verify your email
+                    statusCode: 401
+        '429':
+          description: Too many requests - rate limit exceeded
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /auth/refresh-token:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Generates a new access token using a valid refresh token.
+      operationId: refreshToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+        '401':
+          description: Invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Request password reset
+      description: Sends a password reset OTP to the user's email address.
+      operationId: forgotPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: OTP sent to email
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: OTP sent to email
+        '401':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many requests - rate limit exceeded
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Reset password with OTP
+      description: Resets the user's password using the OTP sent to their email.
+      operationId: resetPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password reset successfully
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          description: Invalid or expired OTP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Too many requests - rate limit exceeded
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User logout
+      description: Invalidates the current JWT token by adding it to the revoked tokens list.
+      operationId: logout
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ==========================================
+  # PROFILE ENDPOINTS
+  # ==========================================
+
+  /profile:
+    get:
+      tags:
+        - Profile
+      summary: Get user profile
+      description: Retrieves the authenticated user's profile information.
+      operationId: getProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    
+    patch:
+      tags:
+        - Profile
+      summary: Update user profile
+      description: Updates the authenticated user's profile information.
+      operationId: updateProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /profile/upload:
+    post:
+      tags:
+        - Profile
+      summary: Upload profile image
+      description: Uploads a profile image to Cloudinary and updates the user's profile.
+      operationId: uploadProfileImage
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Profile image file (JPEG, PNG, etc.)
+      responses:
+        '200':
+          description: Image uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Profile image uploaded successfully
+                  imageUrl:
+                    type: string
+                    example: https://res.cloudinary.com/...
+        '400':
+          description: No image file provided
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ==========================================
+  # BOOKING ENDPOINTS
+  # ==========================================
+
+  /booking:
+    post:
+      tags:
+        - Bookings
+      summary: Create a new booking
+      description: Creates a new booking for a custom or pre-designed garment. Requires either designId or customDesign.
+      operationId: createBooking
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Design not found
+        '500':
+          $ref: '#/components/responses/ServerError'
+    
+    get:
+      tags:
+        - Bookings
+      summary: Get user's bookings
+      description: Retrieves all bookings for the authenticated user.
+      operationId: getUserBookings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /booking/{id}:
+    get:
+      tags:
+        - Bookings
+      summary: Get booking by ID
+      description: Retrieves detailed information about a specific booking.
+      operationId: getBookingById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Booking ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Booking retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: Access denied - not your booking
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /booking/{id}/status:
+    patch:
+      tags:
+        - Bookings
+      summary: Update booking status (Admin only)
+      description: Updates the status of a booking. Only accessible by administrators.
+      operationId: updateBookingStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Booking ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookingStatusRequest'
+      responses:
+        '200':
+          description: Booking status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /booking/admin/all:
+    get:
+      tags:
+        - Bookings
+      summary: Get all bookings (Admin only)
+      description: Retrieves all bookings in the system. Only accessible by administrators.
+      operationId: getAllBookings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All bookings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ==========================================
+  # PAYMENT ENDPOINTS
+  # ==========================================
+
+  /payment/{id}:
+    post:
+      tags:
+        - Payments
+      summary: Initialize payment
+      description: Initializes a Paystack payment for a booking. Supports full and installment payments.
+      operationId: initializePayment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Booking ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitializePaymentRequest'
+      responses:
+        '200':
+          description: Payment initialized successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitializePaymentResponse'
+        '400':
+          description: Invalid payment details or booking already paid
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /payment/verify:
+    get:
+      tags:
+        - Payments
+      summary: Verify payment
+      description: Verifies a payment transaction using the Paystack reference.
+      operationId: verifyPayment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reference
+          in: query
+          required: true
+          description: Paystack payment reference
+          schema:
+            type: string
+            example: REF_abc123xyz
+      responses:
+        '200':
+          description: Payment verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Payment verified successfully
+                  payment:
+                    $ref: '#/components/schemas/Payment'
+        '400':
+          description: Payment already verified or invalid reference
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /payment/webhook:
+    post:
+      tags:
+        - Payments
+      summary: Paystack webhook handler
+      description: Handles webhook events from Paystack for payment status updates.
+      operationId: handleWebhook
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                  example: charge.success
+                data:
+                  type: object
+      responses:
+        '200':
+          description: Webhook processed successfully
+        '400':
+          description: Invalid signature or event
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /payment/history:
+    get:
+      tags:
+        - Payments
+      summary: Get payment history
+      description: Retrieves the payment history for the authenticated user.
+      operationId: getPaymentHistory
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Payment history retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /payment/all-payment:
+    get:
+      tags:
+        - Payments
+      summary: Get all payments (Admin only)
+      description: Retrieves all payment records in the system. Only accessible by administrators.
+      operationId: getAllPayments
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All payments retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /payment/stats:
+    get:
+      tags:
+        - Payments
+      summary: Get payment statistics (Admin only)
+      description: Retrieves payment statistics and analytics. Only accessible by administrators.
+      operationId: getPaymentStats
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Payment statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentStats'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /payment/{paymentId}:
+    get:
+      tags:
+        - Payments
+      summary: Get payment details
+      description: Retrieves detailed information about a specific payment.
+      operationId: getPaymentDetails
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          description: Payment ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Payment details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ==========================================
+  # DESIGN ENDPOINTS
+  # ==========================================
+
+  /design:
+    get:
+      tags:
+        - Designs
+      summary: Get all designs
+      description: Retrieves all active design templates available for booking.
+      operationId: getDesigns
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          required: false
+          description: Filter by design category
+          schema:
+            type: string
+            enum: [NATIVE, CASUAL, FORMAL]
+        - name: isActive
+          in: query
+          required: false
+          description: Filter by active status
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Designs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Design'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    
+    post:
+      tags:
+        - Designs
+      summary: Create a new design (Admin only)
+      description: Creates a new design template with images. Only accessible by administrators.
+      operationId: createDesign
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - category
+                - priceRange
+                - minimumDeliveryTime
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                category:
+                  type: string
+                  enum: [NATIVE, CASUAL, FORMAL]
+                priceRange:
+                  type: string
+                  description: JSON string with min and max prices
+                  example: '{"min": 25000, "max": 50000}'
+                minimumDeliveryTime:
+                  type: number
+                requiredMaterials:
+                  type: string
+                  description: JSON array of required materials
+                  example: '["Fabric", "Thread"]'
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  maxItems: 5
+      responses:
+        '201':
+          description: Design created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Design'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /design/{id}:
+    get:
+      tags:
+        - Designs
+      summary: Get design by ID
+      description: Retrieves detailed information about a specific design.
+      operationId: getDesignById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Design ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Design retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Design'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    
+    patch:
+      tags:
+        - Designs
+      summary: Update a design (Admin only)
+      description: Updates an existing design template. Only accessible by administrators.
+      operationId: updateDesign
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Design ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDesignRequest'
+      responses:
+        '200':
+          description: Design updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Design'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    
+    delete:
+      tags:
+        - Designs
+      summary: Delete a design (Admin only)
+      description: Deletes a design template from the system. Only accessible by administrators.
+      operationId: deleteDesign
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Design ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Design deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Design deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ==========================================
+  # GUIDE ENDPOINTS
+  # ==========================================
+
+  /guide:
+    get:
+      tags:
+        - Guides
+      summary: Get all guides
+      description: Retrieves all measurement guides and tutorials.
+      operationId: getGuides
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Guides retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Guide'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    
+    post:
+      tags:
+        - Guides
+      summary: Create a new guide (Admin only)
+      description: Creates a new measurement guide or tutorial. Only accessible by administrators.
+      operationId: createGuide
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGuideRequest'
+      responses:
+        '201':
+          description: Guide created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guide'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /guide/{id}:
+    get:
+      tags:
+        - Guides
+      summary: Get guide by ID
+      description: Retrieves detailed information about a specific guide.
+      operationId: getGuideById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Guide ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Guide retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guide'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    
+    patch:
+      tags:
+        - Guides
+      summary: Update a guide (Admin only)
+      description: Updates an existing guide. Only accessible by administrators.
+      operationId: updateGuide
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Guide ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGuideRequest'
+      responses:
+        '200':
+          description: Guide updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guide'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    
+    delete:
+      tags:
+        - Guides
+      summary: Delete a guide (Admin only)
+      description: Deletes a guide from the system. Only accessible by administrators.
+      operationId: deleteGuide
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Guide ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Guide deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Guide deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ==========================================
+  # REVIEW ENDPOINTS
+  # ==========================================
+
+  /review/{id}:
+    post:
+      tags:
+        - Reviews
+      summary: Create a review
+      description: Creates a review for a completed booking. Only one review per booking is allowed.
+      operationId: createReview
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Booking ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReviewRequest'
+      responses:
+        '201':
+          description: Review created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '400':
+          description: Booking not completed or already reviewed
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: Not your booking
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /review:
+    get:
+      tags:
+        - Reviews
+      summary: Get all reviews
+      description: Retrieves all reviews in the system.
+      operationId: getReviews
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Reviews retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /review/admin:
+    get:
+      tags:
+        - Reviews
+      summary: Get all reviews (Admin only)
+      description: Retrieves all reviews with detailed information. Only accessible by administrators.
+      operationId: getAdminReviews
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Reviews retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ==========================================
+  # ADMIN/CLIENT MANAGEMENT ENDPOINTS
+  # ==========================================
+
+  /client:
+    get:
+      tags:
+        - Admin
+      summary: Get all clients (Admin only)
+      description: Retrieves a list of all registered clients. Only accessible by administrators.
+      operationId: getAllClients
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Clients retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /client/stats:
+    get:
+      tags:
+        - Admin
+      summary: Get admin statistics (Admin only)
+      description: Retrieves comprehensive statistics about the system. Only accessible by administrators.
+      operationId: getAdminStats
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminStats'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /client/{id}:
+    get:
+      tags:
+        - Admin
+      summary: Get client by ID (Admin only)
+      description: Retrieves detailed information about a specific client. Only accessible by administrators.
+      operationId: getClientById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Client ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Client retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+    
+    delete:
+      tags:
+        - Admin
+      summary: Delete client (Admin only)
+      description: Deletes a client account from the system. Only accessible by administrators.
+      operationId: deleteClient
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Client ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Client deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Client deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ==========================================
+  # HEALTH CHECK ENDPOINT
+  # ==========================================
+
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Checks the health status of the API server.
+      operationId: healthCheck
+      security: []
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheck'
+        '500':
+          $ref: '#/components/responses/ServerError'
