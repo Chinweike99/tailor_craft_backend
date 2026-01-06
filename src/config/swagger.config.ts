@@ -1,12 +1,5 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 
-// Determine the correct server URL based on environment
-const isDevelopment = process.env.NODE_ENV === 'development';
-
-const baseUrl = isDevelopment
-  ? 'https://tailorcraft.onrender.com'
-  : 'https://tailorcraft.onrender.com';
-
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
@@ -49,8 +42,12 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: `${baseUrl}/api/v1`,
-      description: isDevelopment ? 'Development Server' : 'Production Server',
+      url: 'https://tailorcraft.onrender.com/api/v1',
+      description: 'Production Server (Primary)',
+    },
+    {
+      url: 'http://localhost:4000/api/v1',
+      description: 'Development Server (Local Testing)',
     },
   ],
   tags: [
