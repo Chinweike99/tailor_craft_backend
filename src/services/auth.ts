@@ -51,8 +51,16 @@ export const verifyOtp = async(email: string, otp: string) => {
      const pending = await prisma.pendingVerification.findUnique({ where: { email } });
     if (!pending) throw new UnauthorizedError("Verification record not found");
 
-    if (pending.otp !== otp || new Date(pending.otpExpires) < new Date()) {
-        throw new UnauthorizedError("Invalid or expired OTP");
+    // Check if OTP has expired
+    if (new Date(pending.otpExpires) < new Date()) {
+        // Delete expired record to allow re-registration
+        await prisma.pendingVerification.delete({ where: { email } });
+        throw new UnauthorizedError("OTP has expired. Please register again.");
+    }
+
+    // Check if OTP matches
+    if (pending.otp !== otp) {
+        throw new UnauthorizedError("Invalid OTP");
     }
 
     const user = await prisma.user.create({
