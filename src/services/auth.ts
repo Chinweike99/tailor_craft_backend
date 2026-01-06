@@ -38,11 +38,15 @@ export const register = async(data: {name: string, email: string, phone: string,
         }
     });
 
-    await sendEmail({
-        to: data.email,
-        subject: "Verify your email",
-        html: `Your OTP is ${otp}. It expires in ${config.otp.expiresInMinutes} minutes`
-    });
+    try {
+        await sendEmail({
+            to: data.email,
+            subject: "Verify your email",
+            html: `Your OTP is ${otp}. It expires in ${config.otp.expiresInMinutes} minutes`
+        });
+        } catch (err) {
+        console.error("Email failed but user was created:", err);
+        }
     return { message: "OTP Sent to email", data}
 }
 
