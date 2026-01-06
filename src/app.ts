@@ -16,7 +16,7 @@ import { setupKeepAlive } from './services/keep-alive.service';
 import { configCors } from './config/cors.config';
 import { initCleanupService } from './services/cleanup.service';
 import { swaggerSpec } from './config/swagger.config';
-import { verifyEmailConfig } from './utils/email.service';
+// import { verifyEmailConfig } from './utils/email.service';
 
 dotenv.config();
 
@@ -29,8 +29,8 @@ app.use(express.json());
 app.use(configCors());
 setUpDeliveryReminders();
 setupKeepAlive();
-initCleanupService(); // Initialize cleanup service for expired OTPs and tokens
-verifyEmailConfig(); // Verify email service connection on startup
+initCleanupService(); 
+// verifyEmailConfig(); 
 
 // Swagger API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
