@@ -2,9 +2,10 @@ import swaggerJSDoc from 'swagger-jsdoc';
 
 // Determine the correct server URL based on environment
 const isDevelopment = process.env.NODE_ENV === 'development';
-const baseUrl = isDevelopment 
+
+const baseUrl = isDevelopment
   ? 'http://localhost:4000'
-  : (process.env.RENDER_EXTERNAL_URL || 'https://tailorcraft.onrender.com');
+  : 'https://tailorcraft.onrender.com';
 
 const swaggerDefinition = {
   openapi: '3.0.0',
