@@ -1305,6 +1305,532 @@ paths:
           $ref: '#/components/responses/ServerError'
 
   # ==========================================
+  # FEEDBACK ENDPOINTS
+  # ==========================================
+
+  /feedback:
+    post:
+      tags:
+        - Feedback
+      summary: Submit platform feedback (Public)
+      description: Submit feedback about the TailorCraft platform, suggest features, or share thoughts on areas for improvement. No authentication required.
+      operationId: createFeedback
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - message
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 255
+                  description: Your email address for follow-up
+                  example: user@example.com
+                message:
+                  type: string
+                  minLength: 10
+                  maxLength: 1000
+                  description: Feedback message (10-1000 characters)
+                  example: I love the platform! It would be great to have a mobile app version. Also, adding a favorites feature would be helpful.
+      responses:
+        '201':
+          description: Feedback submitted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Feedback submitted successfully. Thank you!
+                  feedback:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      email:
+                        type: string
+                      message:
+                        type: string
+                      createdAt:
+                        type: string
+                        format: date-time
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    get:
+      tags:
+        - Feedback
+      summary: Get all feedback (Admin only)
+      description: Retrieve all feedback submissions. Optionally filter by read status.
+      operationId: getAllFeedback
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: isRead
+          in: query
+          description: Filter by read status
+          required: false
+          schema:
+            type: boolean
+            example: false
+      responses:
+        '200':
+          description: Feedback list retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  feedbacks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        email:
+                          type: string
+                        message:
+                          type: string
+                        isRead:
+                          type: boolean
+                        createdAt:
+                          type: string
+                          format: date-time
+                        updatedAt:
+                          type: string
+                          format: date-time
+                  total:
+                    type: integer
+                    example: 25
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /feedback/{id}/read:
+    patch:
+      tags:
+        - Feedback
+      summary: Mark feedback as read (Admin only)
+      description: Mark a specific feedback as read
+      operationId: markFeedbackAsRead
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Feedback ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Feedback marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Feedback marked as read
+                  feedback:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      email:
+                        type: string
+                      message:
+                        type: string
+                      isRead:
+                        type: boolean
+                        example: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                      updatedAt:
+                        type: string
+                        format: date-time
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /feedback/{id}:
+    delete:
+      tags:
+        - Feedback
+      summary: Delete feedback (Admin only)
+      description: Delete a specific feedback entry
+      operationId: deleteFeedback
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Feedback ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Feedback deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Feedback deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ==========================================
+  # CONTACT US ENDPOINTS
+  # ==========================================
+
+  /contact:
+    post:
+      tags:
+        - Contact
+      summary: Submit contact message (Public)
+      description: Send a contact message to the admin. No authentication required.
+      operationId: createContactMessage
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - subject
+                - message
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                  description: Sender's name (2-100 characters)
+                  example: John Doe
+                email:
+                  type: string
+                  format: email
+                  maxLength: 255
+                  description: Sender's email address
+                  example: john.doe@example.com
+                subject:
+                  type: string
+                  minLength: 5
+                  maxLength: 200
+                  description: Message subject (5-200 characters)
+                  example: Inquiry about custom wedding outfit
+                message:
+                  type: string
+                  minLength: 20
+                  maxLength: 2000
+                  description: Contact message (20-2000 characters)
+                  example: I am interested in ordering a custom traditional wedding outfit. Could you provide more information about your services and pricing?
+      responses:
+        '201':
+          description: Contact message sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Your message has been sent successfully. We will get back to you soon!
+                  contact:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      subject:
+                        type: string
+                      createdAt:
+                        type: string
+                        format: date-time
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    get:
+      tags:
+        - Contact
+      summary: Get all contact messages (Admin only)
+      description: Retrieve all contact messages. Optionally filter by read status.
+      operationId: getAllContactMessages
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: isRead
+          in: query
+          description: Filter by read status
+          required: false
+          schema:
+            type: boolean
+            example: false
+      responses:
+        '200':
+          description: Contact messages retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        name:
+                          type: string
+                        email:
+                          type: string
+                        subject:
+                          type: string
+                        message:
+                          type: string
+                        isRead:
+                          type: boolean
+                        createdAt:
+                          type: string
+                          format: date-time
+                        updatedAt:
+                          type: string
+                          format: date-time
+                  total:
+                    type: integer
+                    example: 15
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /contact/{id}:
+    get:
+      tags:
+        - Contact
+      summary: Get contact message by ID (Admin only)
+      description: Retrieve a specific contact message
+      operationId: getContactMessageById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Contact message ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Contact message retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      subject:
+                        type: string
+                      message:
+                        type: string
+                      isRead:
+                        type: boolean
+                      createdAt:
+                        type: string
+                        format: date-time
+                      updatedAt:
+                        type: string
+                        format: date-time
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    delete:
+      tags:
+        - Contact
+      summary: Delete contact message (Admin only)
+      description: Delete a specific contact message
+      operationId: deleteContactMessage
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Contact message ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Contact message deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Contact message deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /contact/{id}/read:
+    patch:
+      tags:
+        - Contact
+      summary: Mark contact message as read (Admin only)
+      description: Mark a specific contact message as read
+      operationId: markContactAsRead
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Contact message ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Contact message marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Contact message marked as read
+                  contact:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      subject:
+                        type: string
+                      message:
+                        type: string
+                      isRead:
+                        type: boolean
+                        example: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                      updatedAt:
+                        type: string
+                        format: date-time
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ==========================================
   # HEALTH CHECK ENDPOINT
   # ==========================================
 

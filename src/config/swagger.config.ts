@@ -84,6 +84,14 @@ const swaggerDefinition = {
       description: 'Admin-only endpoints for client and system management',
     },
     {
+      name: 'Feedback',
+      description: 'Platform feedback submission - Share thoughts, suggest features, and provide improvement ideas',
+    },
+    {
+      name: 'Contact',
+      description: 'Public contact form and admin message management endpoints',
+    },
+    {
       name: 'Health',
       description: 'System health check endpoints',
     },

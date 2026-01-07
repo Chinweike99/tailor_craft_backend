@@ -141,6 +141,26 @@ model RevokedToken {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
 }
 
+model Feedback {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String
+  message   String
+  isRead    Boolean?  @default(false)
+  createdAt DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model ContactUs {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  email     String
+  subject   String
+  message   String
+  isRead    Boolean?  @default(false)
+  createdAt DateTime? @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime? @default(now()) @db.Timestamptz(6)
+}
+
 enum Role {
   CLIENT
   ADMIN
