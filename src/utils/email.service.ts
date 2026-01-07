@@ -175,281 +175,653 @@ export const sendBookingConfirmation = async (
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Booking Confirmation - TailorCraft</title>
       <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
         * {
           margin: 0;
           padding: 0;
           box-sizing: border-box;
         }
+        
         body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           line-height: 1.6;
-          color: #333;
-          background-color: #f4f4f4;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          padding: 20px 10px;
         }
-        .email-wrapper {
-          max-width: 600px;
+        
+        .email-container {
+          max-width: 650px;
           margin: 0 auto;
-          background-color: #ffffff;
+          background: #ffffff;
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
-        .header {
-          background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-          color: white;
-          padding: 40px 30px;
-          text-align: center;
-        }
-        .header-icon {
-          font-size: 48px;
-          margin-bottom: 10px;
-        }
-        .header h1 {
-          font-size: 28px;
-          font-weight: 600;
-          margin-bottom: 5px;
-        }
-        .header p {
-          font-size: 16px;
-          opacity: 0.95;
-        }
-        .content {
-          padding: 40px 30px;
-        }
-        .greeting {
-          font-size: 18px;
-          color: #2c3e50;
-          margin-bottom: 20px;
-        }
-        .greeting strong {
-          color: #4CAF50;
-        }
-        .message {
-          font-size: 16px;
-          color: #555;
-          margin-bottom: 30px;
-          line-height: 1.8;
-        }
-        .booking-card {
-          background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
-          border: 1px solid #e0e0e0;
-          border-left: 4px solid #4CAF50;
-          border-radius: 8px;
-          padding: 25px;
-          margin: 30px 0;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-        .booking-card-header {
-          font-size: 14px;
-          color: #888;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          margin-bottom: 15px;
-          font-weight: 600;
-        }
-        .booking-id {
-          background-color: #f0f0f0;
-          padding: 12px 16px;
-          border-radius: 6px;
-          font-family: 'Courier New', monospace;
-          font-size: 14px;
-          color: #333;
-          margin-bottom: 20px;
-          word-break: break-all;
-          border: 1px dashed #ccc;
-        }
-        .booking-details {
-          font-size: 15px;
-          color: #444;
-          line-height: 1.9;
-        }
-        .booking-details strong {
-          color: #2c3e50;
-          display: inline-block;
-          min-width: 120px;
-        }
-        .divider {
-          height: 1px;
-          background: linear-gradient(to right, transparent, #e0e0e0, transparent);
-          margin: 25px 0;
-        }
-        .assurance-box {
-          background-color: #e8f5e9;
-          border-left: 4px solid #4CAF50;
-          padding: 20px;
-          border-radius: 6px;
-          margin: 25px 0;
-        }
-        .assurance-box p {
-          color: #2e7d32;
-          font-size: 15px;
-          margin: 0;
+        
+        /* Top Navigation Bar */
+        .navbar {
+          background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+          padding: 16px 30px;
           display: flex;
           align-items: center;
+          justify-content: space-between;
+          border-bottom: 3px solid #fbbf24;
         }
-        .assurance-box .icon {
-          font-size: 24px;
-          margin-right: 12px;
+        
+        .logo {
+          display: flex;
+          align-items: center;
+          gap: 10px;
         }
-        .closing-message {
-          font-size: 16px;
-          color: #555;
-          margin-top: 25px;
-          text-align: center;
-        }
-        .signature {
-          margin-top: 30px;
-          padding-top: 20px;
-          border-top: 2px solid #f0f0f0;
-          text-align: center;
-        }
-        .signature-text {
-          font-size: 15px;
-          color: #666;
-          margin-bottom: 5px;
-        }
-        .company-name {
-          font-size: 18px;
-          font-weight: 600;
-          color: #4CAF50;
+        
+        .logo-icon {
+          width: 36px;
+          height: 36px;
+          background: #fbbf24;
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          font-size: 20px;
         }
-        .footer {
-          background-color: #2c3e50;
-          color: #ecf0f1;
+        
+        .logo-text {
+          color: #ffffff;
+          font-size: 20px;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+        }
+        
+        .nav-status {
+          background: rgba(251, 191, 36, 0.2);
+          padding: 6px 16px;
+          border-radius: 20px;
+          color: #fbbf24;
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        
+        /* Hero Section */
+        .hero {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          padding: 50px 30px;
+          text-align: center;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .hero::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+          background-size: 30px 30px;
+          animation: pulse 20s linear infinite;
+        }
+        
+        @keyframes pulse {
+          0% { transform: translate(0, 0); }
+          100% { transform: translate(30px, 30px); }
+        }
+        
+        .success-icon {
+          width: 80px;
+          height: 80px;
+          background: #ffffff;
+          border-radius: 50%;
+          margin: 0 auto 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 40px;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+          position: relative;
+          z-index: 1;
+        }
+        
+        .hero h1 {
+          color: #ffffff;
+          font-size: 36px;
+          font-weight: 700;
+          margin-bottom: 10px;
+          position: relative;
+          z-index: 1;
+        }
+        
+        .hero p {
+          color: rgba(255, 255, 255, 0.95);
+          font-size: 18px;
+          font-weight: 400;
+          position: relative;
+          z-index: 1;
+        }
+        
+        /* Main Content */
+        .content {
+          padding: 45px 35px;
+          background: #ffffff;
+        }
+        
+        .greeting {
+          font-size: 20px;
+          color: #1f2937;
+          margin-bottom: 20px;
+          font-weight: 500;
+        }
+        
+        .greeting .name {
+          color: #3b82f6;
+          font-weight: 700;
+        }
+        
+        .intro-message {
+          color: #6b7280;
+          font-size: 16px;
+          line-height: 1.8;
+          margin-bottom: 35px;
+          padding: 20px;
+          background: linear-gradient(to right, #f0f9ff, #e0f2fe);
+          border-left: 4px solid #3b82f6;
+          border-radius: 8px;
+        }
+        
+        /* Booking Details Card */
+        .booking-card {
+          background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+          border: 2px solid #e5e7eb;
+          border-radius: 12px;
+          padding: 30px;
+          margin: 30px 0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          position: relative;
+        }
+        
+        .booking-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 4px;
+          background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+          border-radius: 12px 12px 0 0;
+        }
+        
+        .card-title {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 14px;
+          color: #6b7280;
+          text-transform: uppercase;
+          font-weight: 700;
+          letter-spacing: 1.2px;
+          margin-bottom: 25px;
+          padding-bottom: 15px;
+          border-bottom: 2px solid #f3f4f6;
+        }
+        
+        .card-icon {
+          font-size: 20px;
+        }
+        
+        .booking-id-section {
+          background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+          padding: 20px;
+          border-radius: 10px;
+          margin-bottom: 25px;
+          box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+        }
+        
+        .booking-id-label {
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin-bottom: 8px;
+          font-weight: 600;
+        }
+        
+        .booking-id-value {
+          color: #ffffff;
+          font-family: 'Courier New', monospace;
+          font-size: 16px;
+          font-weight: 700;
+          word-break: break-all;
+          background: rgba(0, 0, 0, 0.2);
+          padding: 12px;
+          border-radius: 6px;
+          border: 1px dashed rgba(255, 255, 255, 0.3);
+        }
+        
+        .details-content {
+          color: #374151;
+          font-size: 15px;
+          line-height: 2;
+          padding: 10px 0;
+        }
+        
+        .details-content strong {
+          color: #1f2937;
+          font-weight: 600;
+          display: inline-block;
+          min-width: 140px;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          color: #ffffff;
+          padding: 16px 24px;
+          border-radius: 12px;
+          margin: 30px 0;
+          font-size: 15px;
+          font-weight: 600;
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .status-badge .badge-icon {
+          font-size: 24px;
+        }
+        
+        /* Process Timeline */
+        .timeline {
+          background: #f9fafb;
+          border-radius: 12px;
+          padding: 25px;
+          margin: 30px 0;
+          border: 1px solid #e5e7eb;
+        }
+        
+        .timeline-item {
+          display: flex;
+          gap: 15px;
+          margin-bottom: 20px;
+          align-items: flex-start;
+        }
+        
+        .timeline-item:last-child {
+          margin-bottom: 0;
+        }
+        
+        .timeline-icon {
+          width: 40px;
+          height: 40px;
+          background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 18px;
+          flex-shrink: 0;
+          box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+        }
+        
+        .timeline-content h4 {
+          color: #1f2937;
+          font-size: 16px;
+          font-weight: 600;
+          margin-bottom: 4px;
+        }
+        
+        .timeline-content p {
+          color: #6b7280;
+          font-size: 14px;
+          line-height: 1.6;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+          border-radius: 12px;
           padding: 30px;
           text-align: center;
+          margin: 30px 0;
+          border: 2px solid #fbbf24;
         }
+        
+        .cta-section h3 {
+          color: #92400e;
+          font-size: 20px;
+          font-weight: 700;
+          margin-bottom: 10px;
+        }
+        
+        .cta-section p {
+          color: #78350f;
+          font-size: 15px;
+          line-height: 1.7;
+        }
+        
+        /* Signature */
+        .signature {
+          text-align: center;
+          padding: 30px 0;
+          border-top: 2px solid #f3f4f6;
+          margin-top: 40px;
+        }
+        
+        .signature-text {
+          color: #6b7280;
+          font-size: 15px;
+          margin-bottom: 12px;
+          font-style: italic;
+        }
+        
+        .company-signature {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          font-size: 22px;
+          font-weight: 700;
+          background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        
+        .signature-icon {
+          font-size: 28px;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        /* Footer */
+        .footer {
+          background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+          padding: 40px 30px;
+          color: #d1d5db;
+        }
+        
         .footer-content {
+          text-align: center;
+          margin-bottom: 20px;
+        }
+        
+        .footer-links {
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          margin: 20px 0;
+          flex-wrap: wrap;
+        }
+        
+        .footer-link {
+          color: #9ca3af;
+          text-decoration: none;
           font-size: 13px;
-          line-height: 1.8;
+          padding: 8px 16px;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 6px;
+          transition: all 0.3s ease;
         }
-        .footer-content p {
-          margin: 5px 0;
-        }
+        
         .footer-divider {
           height: 1px;
-          background-color: rgba(255, 255, 255, 0.1);
-          margin: 15px 0;
+          background: linear-gradient(to right, transparent, #374151, transparent);
+          margin: 25px 0;
         }
+        
+        .social-icons {
+          display: flex;
+          justify-content: center;
+          gap: 15px;
+          margin: 20px 0;
+        }
+        
+        .social-icon {
+          width: 36px;
+          height: 36px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #9ca3af;
+          font-size: 16px;
+          transition: all 0.3s ease;
+        }
+        
         .copyright {
-          font-size: 12px;
-          color: #95a5a6;
+          text-align: center;
+          color: #6b7280;
+          font-size: 13px;
+          padding-top: 10px;
         }
+        
         @media only screen and (max-width: 600px) {
+          .navbar {
+            padding: 12px 20px;
+          }
+          
+          .hero {
+            padding: 40px 20px;
+          }
+          
+          .hero h1 {
+            font-size: 28px;
+          }
+          
           .content {
             padding: 30px 20px;
           }
-          .header {
-            padding: 30px 20px;
+          
+          .booking-card {
+            padding: 20px;
           }
-          .header h1 {
-            font-size: 24px;
+          
+          .footer-links {
+            flex-direction: column;
+            gap: 10px;
           }
         }
       </style>
     </head>
     <body>
-      <div class="email-wrapper">
-        <!-- Header -->
-        <div class="header">
-          <div class="header-icon">🎉</div>
-          <h1>Booking Confirmed!</h1>
-          <p>Your order is now in our expert hands</p>
+      <div class="email-container">
+        
+        <!-- Navigation Bar -->
+        <div class="navbar">
+          <div class="logo">
+            <div class="logo-icon">✂️</div>
+            <div class="logo-text">TailorCraft</div>
+          </div>
+          <div class="nav-status">Confirmed</div>
         </div>
-
-        <!-- Content -->
+        
+        <!-- Hero Section -->
+        <div class="hero">
+          <div class="success-icon">✓</div>
+          <h1>Booking Confirmed!</h1>
+          <p>Your journey to exceptional tailoring begins now</p>
+        </div>
+        
+        <!-- Main Content -->
         <div class="content">
+          
           <div class="greeting">
-            Hi <strong>${customerName}</strong>,
+            Hello <span class="name">${customerName}</span>! 👋
           </div>
-
-          <div class="message">
-            Thank you for choosing TailorCraft! We're excited to confirm that your booking has been received and is ready for processing.
+          
+          <div class="intro-message">
+            <strong>Thank you for choosing TailorCraft!</strong> We're thrilled to confirm that your booking has been successfully received. Our master craftsmen are preparing to bring your vision to life with precision and care.
           </div>
-
-          <!-- Booking Card -->
+          
+          <!-- Booking Details Card -->
           <div class="booking-card">
-            <div class="booking-card-header">📋 Your Booking Details</div>
-            
-            <div class="booking-id">
-              <strong>Booking ID:</strong><br>
-              ${bookingId}
+            <div class="card-title">
+              <span class="card-icon">📋</span>
+              <span>Your Booking Information</span>
             </div>
-
-            <div class="booking-details">
+            
+            <div class="booking-id-section">
+              <div class="booking-id-label">Booking Reference Number</div>
+              <div class="booking-id-value">${bookingId}</div>
+            </div>
+            
+            <div class="details-content">
               ${bookingDetails}
             </div>
           </div>
-
-          <!-- Assurance Message -->
-          <div class="assurance-box">
-            <p>
-              <span class="icon">✂️</span>
-              <span>We'll begin tailoring your order shortly. Expect excellence with every stitch!</span>
-            </p>
+          
+          <!-- Status Badge -->
+          <div class="status-badge">
+            <span class="badge-icon">🎯</span>
+            <span>Order Confirmed & Ready for Processing</span>
           </div>
-
-          <div class="divider"></div>
-
-          <div class="closing-message">
-            We're committed to delivering exceptional quality and craftsmanship.
+          
+          <!-- Timeline -->
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-icon">✂️</div>
+              <div class="timeline-content">
+                <h4>Expert Crafting</h4>
+                <p>Our skilled artisans will begin tailoring your order with meticulous attention to detail.</p>
+              </div>
+            </div>
+            
+            <div class="timeline-item">
+              <div class="timeline-icon">👔</div>
+              <div class="timeline-content">
+                <h4>Quality Assurance</h4>
+                <p>Every stitch is inspected to ensure perfection and meet our premium standards.</p>
+              </div>
+            </div>
+            
+            <div class="timeline-item">
+              <div class="timeline-icon">🚚</div>
+              <div class="timeline-content">
+                <h4>Ready for Delivery</h4>
+                <p>Your masterpiece will be carefully prepared and delivered as scheduled.</p>
+              </div>
+            </div>
           </div>
-
+          
+          <!-- CTA Section -->
+          <div class="cta-section">
+            <h3>✨ Excellence in Every Stitch</h3>
+            <p>We're committed to delivering exceptional quality and craftsmanship that exceeds your expectations. Your satisfaction is our masterpiece.</p>
+          </div>
+          
           <!-- Signature -->
           <div class="signature">
-            <p class="signature-text">With warmest regards,</p>
-            <div class="company-name">
-              <span>✨</span>
+            <p class="signature-text">With warmest regards and dedication to excellence,</p>
+            <div class="company-signature">
+              <span class="signature-icon">✨</span>
               <span>The TailorCraft Team</span>
             </div>
           </div>
+          
         </div>
-
+        
         <!-- Footer -->
         <div class="footer">
           <div class="footer-content">
-            <p>This is an automated confirmation email.</p>
-            <p>Please save this email for your records.</p>
+            <p style="margin-bottom: 15px; font-size: 14px;">Need assistance? We're here to help!</p>
+            
+            <div class="footer-links">
+              <a href="#" class="footer-link">Track Order</a>
+              <a href="#" class="footer-link">Contact Support</a>
+              <a href="#" class="footer-link">FAQs</a>
+              <a href="#" class="footer-link">Manage Bookings</a>
+            </div>
+            
+            <div class="social-icons">
+              <div class="social-icon">📧</div>
+              <div class="social-icon">📱</div>
+              <div class="social-icon">💬</div>
+              <div class="social-icon">🌐</div>
+            </div>
           </div>
+          
           <div class="footer-divider"></div>
-          <p class="copyright">© ${new Date().getFullYear()} TailorCraft. All rights reserved.</p>
+          
+          <div class="copyright">
+            <p>This is an automated confirmation email. Please save for your records.</p>
+            <p style="margin-top: 8px;">© ${new Date().getFullYear()} TailorCraft. All rights reserved. | Premium Tailoring Services</p>
+          </div>
         </div>
+        
       </div>
     </body>
     </html>
   `;
 
   const textContent = `
-Hi ${customerName},
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        ✂️ TAILORCRAFT - BOOKING CONFIRMED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🎉 Your booking has been confirmed!
+Hello ${customerName}! 👋
 
-BOOKING DETAILS
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-Booking ID: ${bookingId}
+✓ BOOKING SUCCESSFULLY CONFIRMED
+
+Thank you for choosing TailorCraft! We're thrilled to confirm 
+that your booking has been successfully received. Our master 
+craftsmen are preparing to bring your vision to life.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 YOUR BOOKING INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Booking Reference Number:
+${bookingId}
 
 ${bookingDetails}
-━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-✂️ We'll begin tailoring your order shortly. Expect excellence with every stitch!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 WHAT HAPPENS NEXT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-We're committed to delivering exceptional quality and craftsmanship.
+✂️ EXPERT CRAFTING
+   Our skilled artisans will begin tailoring your order 
+   with meticulous attention to detail.
 
-With warmest regards,
-✨ The TailorCraft Team
+👔 QUALITY ASSURANCE
+   Every stitch is inspected to ensure perfection and 
+   meet our premium standards.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚚 READY FOR DELIVERY
+   Your masterpiece will be carefully prepared and 
+   delivered as scheduled.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EXCELLENCE IN EVERY STITCH
+
+We're committed to delivering exceptional quality and 
+craftsmanship that exceeds your expectations. Your 
+satisfaction is our masterpiece.
+
+With warmest regards and dedication to excellence,
+The TailorCraft Team
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Need assistance? Contact our support team anytime.
+
 This is an automated confirmation email.
-Please save this email for your records.
+Please save this for your records.
 
 © ${new Date().getFullYear()} TailorCraft. All rights reserved.
+Premium Tailoring Services
   `;
 
   await sendEmail({
     to: email,
-    subject: '🎉 Your TailorCraft Booking is Confirmed!',
+    subject: '✓ Booking Confirmed - Your TailorCraft Journey Begins!',
     htmlContent,
     textContent,
   });
