@@ -11,6 +11,8 @@ import designRouther from './routes/admin/design.routes'
 import guideRouther from './routes/admin/guide.routes'
 import reviewRouther from './routes/review.routes'
 import paymentRouther from './routes/payment.routes'
+import feedbackRouther from './routes/feedback.routes'
+import contactRouther from './routes/contact.routes'
 import { setUpDeliveryReminders } from './services/reminder.service';
 import { setupKeepAlive } from './services/keep-alive.service';
 import { configCors } from './config/cors.config';
@@ -48,6 +50,8 @@ app.use(`${BASE_URL}/design`, designRouther);
 app.use(`${BASE_URL}/guide`, guideRouther);
 app.use(`${BASE_URL}/review`, reviewRouther);
 app.use(`${BASE_URL}/payment`, paymentRouther);
+app.use(`${BASE_URL}/feedback`, feedbackRouther);
+app.use(`${BASE_URL}/contact`, contactRouther);
 
 app.get('/', (req: Request, res: Response) => {
     res.send(`
