@@ -65,9 +65,14 @@ export default {
           pass: process.env.EMAIL_PASS,
           service: process.env.EMAIL_SERVICE || "resend",
     },
+    brevo: {
+        apiKey: process.env.BREVO_API_KEY as string,
+        senderEmail: process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_FROM || "noreply@tailorcraft.dev",
+        senderName: process.env.BREVO_SENDER_NAME || "TailorCraft"
+    },
     otp: {
         length: 6,
-        expiresInMinutes: 5
+        expiresInMinutes: parseInt(process.env.OTP_EXPIRY_MINUTES || '5', 10)
     },
     admin: {
         email: process.env.ADMIN_EMAIL as string,

@@ -1,8 +1,8 @@
 import crypto from "crypto";
 import nodemailer from "nodemailer";
-import { Resend } from "resend";
 import config from "../config/config";
 import argon2 from "argon2";
+import { sendEmail as sendBrevoEmail } from "./email.service";
 
 // Initialize 
 // const transporter = nodemailer.createTransport({
@@ -112,52 +112,18 @@ export const sendEmail = async ({
   text?: string;
 }) => {
   try {
-    const service = config.email.service?.toLowerCase() || 'gmail';
-    
-    // Use Resend HTTP API (bypasses SMTP blocking on Render)
-    if (service === 'resend' && process.env.RESEND_API_KEY) {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      
-      const { data, error } = await resend.emails.send({
-        from: config.email.from || 'onboarding@resend.dev',
-        to: [to],
-        subject,
-        html,
-        text,
-      });
-
-      if (error) {
-        console.error("Resend API error:", error);
-        throw new Error(`Resend error: ${error.message}`);
-      }
-
-      console.log(`✅ Email sent successfully via Resend to ${to}`, data);
-      return;
-    }
-
-    // Fallback to SMTP for other services
-    if (process.env.NODE_ENV === 'development') {
-      await debugGmailSetup();
-    }
-
-    const mailOptions = {
-      from: config.email.from,
+    // Use the new Brevo email service
+    await sendBrevoEmail({
       to,
       subject,
-      text,
-      html,
-    };
-
-    await transporter.sendMail(mailOptions);
-    console.log(`Email sent successfully to ${to}`);
+      htmlContent: html,
+      textContent: text,
+    });
   } catch (error) {
     console.error("Email sending failed:", error);
     console.error("Email config status:", {
-      service: config.email.service,
-      hasResendKey: !!process.env.RESEND_API_KEY,
-      hasEmailUser: !!config.email.user,
-      hasEmailPass: !!config.email.pass,
-      emailFrom: config.email.from,
+      hasBrevoKey: !!config.brevo.apiKey,
+      senderEmail: config.brevo.senderEmail,
       targetEmail: to
     });
     // Provide more detailed error information
