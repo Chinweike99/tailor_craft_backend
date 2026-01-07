@@ -1,6 +1,5 @@
 import crypto from "crypto";
 import nodemailer from "nodemailer";
-import { Resend } from "resend";
 import config from "../config/config";
 import argon2 from "argon2";
 import { sendEmail as sendBrevoEmail } from "./email.service";
