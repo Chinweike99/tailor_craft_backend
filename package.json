@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/Chinweike99/tailor_craft_backend#readme",
   "dependencies": {
+    "@getbrevo/brevo": "^3.0.1",
     "@prisma/client": "^6.8.1",
     "@sendgrid/mail": "^8.1.5",
     "axios": "^1.11.0",
